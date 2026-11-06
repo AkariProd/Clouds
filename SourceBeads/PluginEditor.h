@@ -10,8 +10,9 @@
     white panel, black knobs, big DENSITY knob flanked by TIME/PITCH then
     SIZE/SHAPE, a row of seven small trim pots underneath (Feedback, Dry/Wet,
     Reverb, then the four CV-amount attenuverters), FREEZE/SEED at the top
-    corners, and decorative jack rows at the bottom (hardware's CV + audio
-    I/O — a VST has no literal jacks, these are visual only). Branded
+    corners. No decorative jack rows — a VST has no patch cables, so fake
+    jacks that look clickable but aren't were actively confusing rather than
+    just decorative; removed rather than kept as dead weight. Branded
     "Pebble" / "SoulMade" rather than the original names, per Mutable
     Instruments' own guidance for derivative works; their CC-BY-SA-licensed
     panel layout is recreated, their trademarked logo is not — the bottom
@@ -34,7 +35,6 @@ private:
     };
 
     void makeKnob (Knob& k, const juce::String& paramId, const juce::String& text, juce::Colour accent = {});
-    void drawJackRow (juce::Graphics& g, juce::Rectangle<int> area, std::initializer_list<juce::String> labels);
 
     PebbleProcessor& proc_;
     bds::PebbleLookAndFeel lnf_;
@@ -55,8 +55,6 @@ private:
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> freezeAtt_, seedAtt_, seedLockAtt_, monoGrainAtt_, outputGateAtt_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> mediaAtt_;
-
-    juce::Rectangle<int> cvJackRowArea_, audioJackRowArea_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PebbleEditor)
 };

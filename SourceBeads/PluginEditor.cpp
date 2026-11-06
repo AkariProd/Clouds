@@ -54,7 +54,7 @@ PebbleEditor::PebbleEditor (PebbleProcessor& p)
     mediaLabel_.setJustificationType (juce::Justification::centred);
     mediaAtt_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (proc_.apvts, bds::pid::media, mediaBox_);
 
-    setSize (480, 760);
+    setSize (480, 650);
 }
 
 PebbleEditor::~PebbleEditor()
@@ -77,34 +77,6 @@ void PebbleEditor::makeKnob (Knob& k, const juce::String& paramId, const juce::S
     k.attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc_.apvts, paramId, k.slider);
 }
 
-void PebbleEditor::drawJackRow (juce::Graphics& g, juce::Rectangle<int> area, std::initializer_list<juce::String> labels)
-{
-    const int n = (int) labels.size();
-    if (n == 0)
-        return;
-    const int w = area.getWidth() / n;
-    int i = 0;
-    for (const auto& label : labels)
-    {
-        auto cell = area.withX (area.getX() + i * w).withWidth (w);
-        const float d = (float) juce::jmin (w - 10, 26);
-        auto circle = juce::Rectangle<float> (d, d).withCentre (cell.getCentre().toFloat());
-
-        g.setColour (juce::Colour (0xffcfcfc8));
-        g.fillEllipse (circle);
-        g.setColour (juce::Colour (0xff8a8a82));
-        g.drawEllipse (circle, 1.2f);
-        g.setColour (juce::Colour (0xff555550));
-        g.fillEllipse (circle.reduced (d * 0.32f));
-
-        g.setColour (kInk);
-        g.setFont (juce::Font (juce::FontOptions (9.0f)));
-        g.drawText (label, cell.withY (cell.getBottom() - 14).withHeight (14),
-                    juce::Justification::centred);
-        ++i;
-    }
-}
-
 void PebbleEditor::paint (juce::Graphics& g)
 {
     g.fillAll (kPanel);
@@ -122,16 +94,6 @@ void PebbleEditor::paint (juce::Graphics& g)
     g.setFont (juce::Font (juce::FontOptions (11.0f)));
     g.setColour (juce::Colour (0xff555550));
     g.drawText ("texture synthesizer", header, juce::Justification::centredRight);
-
-    drawJackRow (g, cvJackRowArea_, { "ASSIGN", "DENSITY", "PITCH", "TIME", "SIZE", "SHAPE" });
-    g.setColour (juce::Colour (0xff999992));
-    g.setFont (juce::Font (juce::FontOptions (9.0f)).boldened());
-    g.drawText ("CV IN", cvJackRowArea_.withY (cvJackRowArea_.getY() - 12).withHeight (12),
-                juce::Justification::centredLeft);
-
-    drawJackRow (g, audioJackRowArea_, { "IN L", "IN R", "FREEZE", "SEED", "L", "R" });
-    g.drawText ("I/O", audioJackRowArea_.withY (audioJackRowArea_.getY() - 12).withHeight (12),
-                juce::Justification::centredLeft);
 
     // Original vendor mark (not a copy of Mutable Instruments' logo).
     auto badge = getLocalBounds().removeFromBottom (24).reduced (16, 2);
@@ -188,14 +150,6 @@ void PebbleEditor::resized()
         k->label.setBounds (cell.removeFromBottom (14));
     }
     area.removeFromTop (14);
-
-    // Decorative CV jack row (visual only — see header comment).
-    cvJackRowArea_ = area.removeFromTop (42);
-    area.removeFromTop (16);
-
-    // Decorative audio I/O jack row.
-    audioJackRowArea_ = area.removeFromTop (42);
-    area.removeFromTop (10);
 
     // Utility row: controls the real hardware reaches via button-holds
     // rather than a dedicated knob (quality/media, grain mode, gate out,
