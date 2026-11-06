@@ -109,3 +109,68 @@ if(CLOUDIUS_PANEL_SHOT)
     target_include_directories(panel_shot PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
     target_link_libraries(panel_shot PRIVATE juce::juce_audio_utils juce::juce_dsp)
 endif()
+
+# ---------------------------------------------------------------------------
+# Pebble — port of Mutable Instruments' Beads texture synthesizer.
+# ---------------------------------------------------------------------------
+
+juce_add_plugin(Pebble
+    COMPANY_NAME            "KubiCorp"
+    BUNDLE_ID               "com.kubicorp.pebble"
+    PLUGIN_MANUFACTURER_CODE Kcrp
+    PLUGIN_CODE             Pbbl
+    FORMATS                 VST3 AU Standalone
+    PRODUCT_NAME            "Pebble"
+    DESCRIPTION             "Texture synthesizer (granular / media-emulating delay)"
+    IS_SYNTH                FALSE
+    NEEDS_MIDI_INPUT        TRUE
+    NEEDS_MIDI_OUTPUT       FALSE
+    IS_MIDI_EFFECT          FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    VST3_CATEGORIES         Fx Delay "Pitch Shift"
+    AU_MAIN_TYPE            kAudioUnitType_Effect)
+
+set(PEBBLE_PLUGIN_SOURCES
+    SourceBeads/PluginProcessor.cpp
+    SourceBeads/PluginEditor.cpp
+    SourceBeads/Parameters.cpp
+    SourceBeads/BeadsEngine.cpp)
+
+# The Beads DSP, verbatim from the firmware tree (dsp/ processor path only —
+# the no-input "Synth" fallback oscillator and all hardware driver/UI/
+# settings/calibration code are excluded, see SourceBeads/BeadsEngine.h).
+set(PEBBLE_DSP_SOURCES
+    eurorack/beads/dsp/delay_clock.cc
+    eurorack/beads/dsp/delay_controller.cc
+    eurorack/beads/dsp/mu_law.cc
+    eurorack/beads/dsp/processor.cc
+    eurorack/beads/dsp/trigger_generator.cc
+    eurorack/beads/resources.cc
+    eurorack/stmlib/dsp/atan.cc
+    eurorack/stmlib/dsp/units.cc
+    eurorack/stmlib/utils/random.cc)
+
+target_sources(Pebble PRIVATE ${PEBBLE_PLUGIN_SOURCES} ${PEBBLE_DSP_SOURCES})
+
+target_compile_definitions(Pebble PUBLIC
+    _USE_MATH_DEFINES=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0
+    TEST=1)
+
+target_include_directories(Pebble SYSTEM PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
+target_include_directories(Pebble PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/SourceBeads")
+
+target_link_libraries(Pebble PRIVATE
+    juce::juce_audio_utils
+    juce::juce_dsp
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags)
