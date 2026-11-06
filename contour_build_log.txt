@@ -1,0 +1,124 @@
+MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
+
+  Checking File Globs
+  Contour_rc_lib.vcxproj -> C:\Users\produ\dev\skyjad\build\Contour_rc_lib.dir\Release\Contour_rc_lib.lib
+  Building VST3 manifest helper for Contour
+  -- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.26200.
+  -- Configuring done (0.0s)
+  -- Generating done (0.1s)
+  -- Build files have been written to: C:/Users/produ/dev/skyjad/build/vst3_helpers/Contour
+  MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
+  
+    1>Checking Build System
+    Building Custom Rule C:/Users/produ/dev/JUCE/extras/Build/CMake/juce_vst3_helper/CMakeLists.txt
+    vst3_helper.vcxproj -> C:\Users\produ\dev\skyjad\build\vst3_helpers\Contour\vst3_helper.exe
+    Building Custom Rule C:/Users/produ/dev/JUCE/extras/Build/CMake/juce_vst3_helper/CMakeLists.txt
+  PluginProcessor.cpp
+  PluginEditor.cpp
+  Parameters.cpp
+  GridsEngine.cpp
+  pattern_generator.cc
+  resources.cc
+  random.cc
+  juce_audio_processors.cpp
+  juce_gui_extra.cpp
+  juce_gui_basics.cpp
+  juce_gui_basics_2.cpp
+  juce_gui_basics_3.cpp
+  juce_gui_basics_4.cpp
+  juce_gui_basics_5.cpp
+  juce_graphics.cpp
+  juce_graphics_Harfbuzz.cpp
+  juce_events.cpp
+  juce_core.cpp
+  juce_core_CompilationTime.cpp
+  juce_data_structures.cpp
+  juce_audio_processors_headless.cpp
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(44,37): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginEditor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(44,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginEditor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(84,37): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginEditor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(84,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginEditor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(44,37): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginProcessor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(44,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginProcessor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(84,37): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginProcessor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(84,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/PluginProcessor.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(44,37): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/GridsEngine.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(44,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/GridsEngine.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(84,37): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/GridsEngine.cpp')
+  
+C:\Users\produ\dev\skyjad\SourceGrids\GridsEngine.h(84,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  (compiling source file '../SourceGrids/GridsEngine.cpp')
+  
+C:\Users\produ\dev\JUCE\modules\juce_gui_basics\juce_gui_basics.cpp(61): warning : This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored [C:\Users\produ\dev\skyjad\build\Contour.vcxproj]
+  juce_audio_processors_headless_ara.cpp
+  juce_audio_processors_headless_lv2_libs.cpp
+  juce_audio_basics.cpp
+  juce_audio_utils.cpp
+  juce_audio_formats.cpp
+  juce_audio_devices.cpp
+  juce_dsp.cpp
+  juce_graphics_Sheenbidi.c
+  juce_graphics_libjpg_1.c
+  juce_graphics_libjpg_2.c
+  juce_graphics_libjpg_3.c
+  juce_graphics_libpng.c
+  juce_graphics_libwebp_dec.c
+  juce_graphics_libwebp_dsp_dec.c
+  juce_graphics_libwebp_dsp_dec_avx2.c
+  juce_graphics_libwebp_dsp_dec_sse41.c
+  juce_graphics_libwebp_dsp_enc.c
+  juce_graphics_libwebp_dsp_enc_avx2.c
+  juce_graphics_libwebp_dsp_enc_sse41.c
+  juce_graphics_libwebp_enc.c
+  juce_graphics_libwebp_sharpyuv.c
+  juce_graphics_libwebp_utils.c
+  juce_graphics_lunasvg.c
+  juce_core_zlib.c
+  juce_audio_formats_flac_1.c
+  juce_audio_formats_flac_2.c
+  juce_audio_formats_ogg.c
+  juce_audio_formats_opus.c
+  juce_audio_formats_opusfile.c
+  Contour.vcxproj -> C:\Users\produ\dev\skyjad\build\Contour_artefacts\Release\Contour_SharedCode.lib
+  Building Custom Rule C:/Users/produ/dev/skyjad/CMakeLists.txt
+  juce_audio_plugin_client_AAX.cpp
+  juce_audio_plugin_client_AAX_utils.cpp
+  juce_audio_plugin_client_ARA.cpp
+  juce_audio_plugin_client_LV2.cpp
+  juce_audio_plugin_client_Standalone.cpp
+  juce_audio_plugin_client_Unity.cpp
+  juce_audio_plugin_client_VST2.cpp
+  juce_audio_plugin_client_VST3.cpp
+     Creating library C:/Users/produ/dev/skyjad/build/Contour_artefacts/Release/VST3/Contour.lib and object C:/Users/produ/dev/skyjad/build/Contour_artefacts/Release/VST3/Contour.exp
+  Generating code
+  Finished generating code
+  Contour_VST3.vcxproj -> C:\Users\produ\dev\skyjad\build\Contour_artefacts\Release\VST3\Contour.vst3\Contents\x86_64-win\Contour.vst3
+  removing moduleinfo.json
+  creating C:/Users/produ/dev/skyjad/build/Contour_artefacts/Release/VST3/Contour.vst3/Contents/Resources/moduleinfo.json
+  -- Installing: C:\Program Files\Common Files/VST3/Contour.vst3
+  -- Installing: C:\Program Files\Common Files/VST3/Contour.vst3/Contents
+  -- Installing: C:\Program Files\Common Files/VST3/Contour.vst3/Contents/Resources
+  -- Installing: C:\Program Files\Common Files/VST3/Contour.vst3/Contents/Resources/moduleinfo.json
+  -- Installing: C:\Program Files\Common Files/VST3/Contour.vst3/Contents/x86_64-win
+  -- Installing: C:\Program Files\Common Files/VST3/Contour.vst3/Contents/x86_64-win/Contour.vst3

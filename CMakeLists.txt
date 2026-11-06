@@ -96,6 +96,69 @@ target_link_libraries(Cloudius PRIVATE
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags)
 
+# ---------------------------------------------------------------------------
+# Contour — host-synced standalone instrument port of Mutable Instruments'
+# Grids topographic drum sequencer, with original built-in drum synthesis
+# (Grids itself only ever produced TRIG/ACC gates for other modules).
+#
+# NOTE: unlike Clouds/Beads/Rings (STM32F projects, MIT-licensed), Grids is
+# an AVR project and is GPL-3.0 licensed per the eurorack repo's own
+# README. The vendored eurorack/grids + eurorack/avrlib sources below are
+# GPL-3.0; a built/distributed Contour binary inherits that license.
+# ---------------------------------------------------------------------------
+
+juce_add_plugin(Contour
+    COMPANY_NAME            "SoulMade"
+    BUNDLE_ID               "com.soulmade.contour"
+    PLUGIN_MANUFACTURER_CODE Kcrp
+    PLUGIN_CODE             Cntr
+    FORMATS                 VST3 AU Standalone
+    PRODUCT_NAME            "Contour"
+    DESCRIPTION             "Topographic drum sequencer / instrument"
+    IS_SYNTH                TRUE
+    NEEDS_MIDI_INPUT        FALSE
+    NEEDS_MIDI_OUTPUT       FALSE
+    IS_MIDI_EFFECT          FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    VST3_CATEGORIES         Instrument Drum
+    AU_MAIN_TYPE            kAudioUnitType_MusicDevice)
+
+set(CONTOUR_PLUGIN_SOURCES
+    SourceGrids/PluginProcessor.cpp
+    SourceGrids/PluginEditor.cpp
+    SourceGrids/Parameters.cpp
+    SourceGrids/GridsEngine.cpp)
+
+set(CONTOUR_DSP_SOURCES
+    eurorack/grids/pattern_generator.cc
+    eurorack/grids/resources.cc
+    eurorack/avrlib/random.cc)
+
+target_sources(Contour PRIVATE ${CONTOUR_PLUGIN_SOURCES} ${CONTOUR_DSP_SOURCES})
+
+target_compile_definitions(Contour PUBLIC
+    _USE_MATH_DEFINES=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0)
+
+target_include_directories(Contour SYSTEM PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/eurorack"
+    "${CMAKE_CURRENT_SOURCE_DIR}/eurorack/avr_shim")
+target_include_directories(Contour PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/SourceGrids")
+
+target_link_libraries(Contour PRIVATE
+    juce::juce_audio_utils
+    juce::juce_dsp
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags)
+
 # Dev tool: render the faceplate to PNGs without a host. -DCLOUDIUS_PANEL_SHOT=ON
 option(CLOUDIUS_PANEL_SHOT "Build the offscreen faceplate renderer" OFF)
 if(CLOUDIUS_PANEL_SHOT)
