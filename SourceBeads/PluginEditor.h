@@ -63,7 +63,7 @@ private:
     };
 
     void makeKnob (Knob& k, const juce::String& paramId, const juce::String& text, bool whiteCap);
-    static void drawJack (juce::Graphics& g, juce::Point<float> centre, float radius);
+    void drawJack (juce::Graphics& g, juce::Point<float> centre, float radius);
     static void drawDotted (juce::Graphics& g, juce::Point<float> a, juce::Point<float> b);
 
     PebbleProcessor& proc_;

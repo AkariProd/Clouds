@@ -186,29 +186,10 @@ void PebbleEditor::makeKnob (Knob& k, const juce::String& paramId, const juce::S
 
 void PebbleEditor::drawJack (juce::Graphics& g, juce::Point<float> centre, float radius)
 {
-    juce::DropShadow shadow (juce::Colours::black.withAlpha (0.25f), (int) (radius * 0.5f), { 0, (int) (radius * 0.2f) });
-    juce::Path p;
-    p.addEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
-    shadow.drawForPath (g, p);
-
-    juce::ColourGradient chrome (juce::Colour (0xffe8e4d8), centre.x - radius, centre.y - radius,
-                                  juce::Colour (0xff9a9488), centre.x + radius, centre.y + radius, false);
-    g.setGradientFill (chrome);
-    g.fillEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
-
-    for (int i = 0; i < 20; ++i)
-    {
-        const float a = (float) i / 20.0f * juce::MathConstants<float>::twoPi;
-        g.setColour (juce::Colour (0xff5a564c).withAlpha (0.4f));
-        g.drawLine (juce::Line<float> (centre.getPointOnCircumference (radius * 0.82f, a),
-                                        centre.getPointOnCircumference (radius * 0.98f, a)), 0.6f);
-    }
-
-    const float innerR = radius * 0.5f;
-    g.setColour (juce::Colour (0xff0a0a0a));
-    g.fillEllipse (centre.x - innerR, centre.y - innerR, innerR * 2.0f, innerR * 2.0f);
-    g.setColour (juce::Colours::white.withAlpha (0.3f));
-    g.fillEllipse (centre.x - radius * 0.6f, centre.y - radius * 0.7f, radius * 0.3f, radius * 0.18f);
+    const auto& img = lnf_.jackImage();
+    if (img.isValid())
+        g.drawImage (img, centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f,
+                      0, 0, img.getWidth(), img.getHeight());
 }
 
 void PebbleEditor::drawDotted (juce::Graphics& g, juce::Point<float> a, juce::Point<float> b)
