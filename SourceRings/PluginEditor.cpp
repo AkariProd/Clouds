@@ -5,8 +5,8 @@ namespace
 const juce::Colour kCyan   (0xff29c7d6);
 const juce::Colour kMagenta(0xffd63a8f);
 const juce::Colour kAmber  (0xfff2a93c);
-const juce::Colour kPanel  (0xff1c1c1c);
-const juce::Colour kInk    (0xffffffff);
+const juce::Colour kPanel  (0xfff4f3ef);   // light cream, matches the real panel
+const juce::Colour kInk    (0xff1a1a1a);
 }
 
 ChimeEditor::ChimeEditor (ChimeProcessor& p)
@@ -20,11 +20,11 @@ ChimeEditor::ChimeEditor (ChimeProcessor& p)
     makeKnob (damping_, rng::pid::damping, "DAMPING", kMagenta);
     makeKnob (position_, rng::pid::position, "POSITION", kAmber);
 
-    makeKnob (frequencyAmount_, rng::pid::frequencyAmount, "FM AMT", kCyan);
-    makeKnob (structureAmount_, rng::pid::structureAmount, "STR AMT", kMagenta);
-    makeKnob (brightnessAmount_, rng::pid::brightnessAmount, "BRI AMT", kAmber);
-    makeKnob (dampingAmount_, rng::pid::dampingAmount, "DMP AMT", kMagenta);
-    makeKnob (positionAmount_, rng::pid::positionAmount, "POS AMT", kAmber);
+    makeKnob (frequencyAmount_, rng::pid::frequencyAmount, "FREQ", kCyan);
+    makeKnob (structureAmount_, rng::pid::structureAmount, "STRUCT", kMagenta);
+    makeKnob (brightnessAmount_, rng::pid::brightnessAmount, "BRIGHT", kAmber);
+    makeKnob (dampingAmount_, rng::pid::dampingAmount, "DAMP", kMagenta);
+    makeKnob (positionAmount_, rng::pid::positionAmount, "POS", kAmber);
 
     modelBox_.addItemList ({ "Modal Resonator", "Sympathetic Strings", "Modulated/Inharmonic String",
                               "FM Voice", "Sympathetic Strings (Quantized)", "String + Reverb" }, 1);
@@ -35,7 +35,7 @@ ChimeEditor::ChimeEditor (ChimeProcessor& p)
     for (auto* l : { &modelLabel_, &strumLabel_, &polyLabel_ })
     {
         l->setJustificationType (juce::Justification::centred);
-        l->setColour (juce::Label::textColourId, juce::Colour (0xffaaaaaa));
+        l->setColour (juce::Label::textColourId, juce::Colour (0xff777770));
         l->setFont (juce::Font (juce::FontOptions (10.0f)).boldened());
         addAndMakeVisible (l);
     }
@@ -45,7 +45,7 @@ ChimeEditor::ChimeEditor (ChimeProcessor& p)
     strumAtt_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (proc_.apvts, rng::pid::strumMode, strumBox_);
     polyAtt_  = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc_.apvts, rng::pid::polyphony, polySlider_);
 
-    setSize (460, 640);
+    setSize (460, 700);
 }
 
 ChimeEditor::~ChimeEditor()
@@ -68,32 +68,99 @@ void ChimeEditor::makeKnob (Knob& k, const juce::String& paramId, const juce::St
     k.attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc_.apvts, paramId, k.slider);
 }
 
+void ChimeEditor::drawJackRow (juce::Graphics& g, juce::Rectangle<int> area, std::initializer_list<juce::String> labels)
+{
+    const int n = (int) labels.size();
+    if (n == 0)
+        return;
+    const int w = area.getWidth() / n;
+    int i = 0;
+    for (const auto& label : labels)
+    {
+        auto cell = area.withX (area.getX() + i * w).withWidth (w);
+        const float d = (float) juce::jmin (w - 10, 26);
+        auto circle = juce::Rectangle<float> (d, d).withCentre (cell.getCentre().toFloat());
+
+        g.setColour (juce::Colour (0xffcfcfc8));
+        g.fillEllipse (circle);
+        g.setColour (juce::Colour (0xff8a8a82));
+        g.drawEllipse (circle, 1.2f);
+        g.setColour (juce::Colour (0xff555550));
+        g.fillEllipse (circle.reduced (d * 0.32f));
+
+        g.setColour (kInk);
+        g.setFont (juce::Font (juce::FontOptions (9.0f)));
+        g.drawText (label, cell.withY (cell.getBottom() - 14).withHeight (14),
+                    juce::Justification::centred);
+        ++i;
+    }
+}
+
 void ChimeEditor::paint (juce::Graphics& g)
 {
     g.fillAll (kPanel);
 
-    g.setColour (juce::Colour (0xff3a3a3a));
-    for (auto p : { juce::Point<int> (12, 12), juce::Point<int> (getWidth() - 12, 12),
-                     juce::Point<int> (12, getHeight() - 12), juce::Point<int> (getWidth() - 12, getHeight() - 12) })
-        g.fillEllipse ((float) p.x - 3.0f, (float) p.y - 3.0f, 6.0f, 6.0f);
+    // Four corner mounting-screw dots, like the real faceplate.
+    g.setColour (juce::Colour (0xffb5b5ac));
+    for (auto pt : { juce::Point<int> (12, 12), juce::Point<int> (getWidth() - 12, 12),
+                      juce::Point<int> (12, getHeight() - 12), juce::Point<int> (getWidth() - 12, getHeight() - 12) })
+        g.fillEllipse ((float) pt.x - 3.0f, (float) pt.y - 3.0f, 6.0f, 6.0f);
 
-    // Ring motif behind the five main knobs, echoing the module's own
-    // circular graphic.
-    auto ringArea = getLocalBounds().reduced (16, 10).withTrimmedTop (36).withHeight (260);
-    g.setColour (juce::Colour (0xff2a2a2a));
-    g.drawEllipse (ringArea.toFloat().reduced (8.0f), 1.5f);
-    g.drawEllipse (ringArea.toFloat().reduced (24.0f), 1.0f);
+    // Faint radial/mandala pattern behind the big knobs, echoing the
+    // panel's own screened decoration.
+    auto decoArea = getLocalBounds().reduced (16, 10).withTrimmedTop (60).withHeight (150);
+    g.setColour (juce::Colour (0xffe6e4de));
+    for (auto cx : { decoArea.getX() + decoArea.getWidth() / 4, decoArea.getRight() - decoArea.getWidth() / 4 })
+    {
+        auto c = juce::Point<float> ((float) cx, (float) decoArea.getCentreY());
+        for (int r = 10; r <= 64; r += 10)
+            g.drawEllipse (c.x - (float) r, c.y - (float) r, (float) r * 2.0f, (float) r * 2.0f, 0.6f);
+    }
+
+    // Dotted connector lines: Frequency->Brightness, Structure->Position,
+    // and both big knobs crossing diagonally through Damping in the
+    // middle — matching the photo's wiring-diagram motif.
+    auto dotted = [&] (juce::Point<float> a, juce::Point<float> b)
+    {
+        if (a.isOrigin() || b.isOrigin())
+            return;
+        juce::Path line;
+        line.startNewSubPath (a);
+        line.lineTo (b);
+        juce::Path dashed;
+        const float dashLengths[] = { 3.0f, 3.0f };
+        juce::PathStrokeType (1.2f).createDashedStroke (dashed, line, dashLengths, 2);
+        g.setColour (juce::Colour (0xffb5b5ac));
+        g.fillPath (dashed);
+    };
+
+    dotted (freqCentre_, brightCentre_);
+    dotted (structCentre_, posCentre_);
+    dotted (freqCentre_, dampCentre_);
+    dotted (structCentre_, dampCentre_);
 
     auto header = getLocalBounds().reduced (16, 10).removeFromTop (34);
     g.setColour (kInk);
     g.setFont (juce::Font (juce::FontOptions (24.0f)).boldened());
     g.drawText ("Chime", header, juce::Justification::centredLeft);
     g.setFont (juce::Font (juce::FontOptions (11.0f)));
-    g.setColour (juce::Colour (0xff999999));
+    g.setColour (juce::Colour (0xff555550));
     g.drawText ("resonator", header, juce::Justification::centredRight);
 
+    // Small +/- marks flanking the attenuverter row.
+    g.setFont (juce::Font (juce::FontOptions (12.0f)).boldened());
+    g.setColour (juce::Colour (0xff777770));
+    for (auto* k : { &frequencyAmount_, &structureAmount_, &brightnessAmount_, &dampingAmount_, &positionAmount_ })
+    {
+        auto b = k->slider.getBounds();
+        g.drawText ("-", b.withX (b.getX() - 14).withWidth (14), juce::Justification::centred);
+        g.drawText ("+", b.withX (b.getRight()).withWidth (14), juce::Justification::centred);
+    }
+
+    drawJackRow (g, jackRowArea_, { "STRUM", "V/OCT", "IN", "ODD", "EVEN" });
+
     auto badge = getLocalBounds().removeFromBottom (24).reduced (16, 2);
-    g.setColour (juce::Colour (0xff888888));
+    g.setColour (juce::Colour (0xff777770));
     g.setFont (juce::Font (juce::FontOptions (10.0f)).boldened());
     g.drawText ("SOULMADE", badge, juce::Justification::centredLeft);
     g.setFont (juce::Font (juce::FontOptions (9.0f)));
@@ -106,29 +173,40 @@ void ChimeEditor::resized()
     area.removeFromTop (38);
     area.removeFromBottom (26);
 
-    // Five main knobs: Frequency centred top, Structure/Brightness either
-    // side, Damping/Position below those.
-    auto topRow = area.removeFromTop (130);
-    const int bigSize = 90;
-    frequency_.slider.setBounds (topRow.withSizeKeepingCentre (bigSize, bigSize));
-    frequency_.label.setBounds (topRow.withSizeKeepingCentre (bigSize, 16).withY (topRow.getBottom() - 18));
+    // Two big knobs, side by side.
+    auto topRow = area.removeFromTop (140);
+    const int bigSize = 100;
+    auto freqCell = topRow.removeFromLeft (topRow.getWidth() / 2);
+    frequency_.slider.setBounds (freqCell.withSizeKeepingCentre (bigSize, bigSize));
+    frequency_.label.setBounds (freqCell.withSizeKeepingCentre (bigSize, 16).withY (freqCell.getBottom() - 18));
+    auto structCell = topRow;
+    structure_.slider.setBounds (structCell.withSizeKeepingCentre (bigSize, bigSize));
+    structure_.label.setBounds (structCell.withSizeKeepingCentre (bigSize, 16).withY (structCell.getBottom() - 18));
 
-    auto midRow = area.removeFromTop (120);
-    auto left1 = midRow.removeFromLeft (midRow.getWidth() / 2);
-    structure_.label.setBounds (left1.removeFromTop (16));
-    structure_.slider.setBounds (left1);
-    brightness_.label.setBounds (midRow.removeFromTop (16));
-    brightness_.slider.setBounds (midRow);
-
-    area.removeFromTop (6);
-    auto lowRow = area.removeFromTop (120);
-    auto left2 = lowRow.removeFromLeft (lowRow.getWidth() / 2);
-    damping_.label.setBounds (left2.removeFromTop (16));
-    damping_.slider.setBounds (left2);
-    position_.label.setBounds (lowRow.removeFromTop (16));
-    position_.slider.setBounds (lowRow);
+    freqCentre_ = frequency_.slider.getBounds().getCentre().toFloat();
+    structCentre_ = structure_.slider.getBounds().getCentre().toFloat();
 
     area.removeFromTop (10);
+
+    // Three medium knobs in equal thirds.
+    auto midRow = area.removeFromTop (120);
+    const int midSize = 80;
+    const int thirdW = midRow.getWidth() / 3;
+    auto brightCell = midRow.removeFromLeft (thirdW);
+    brightness_.slider.setBounds (brightCell.withSizeKeepingCentre (midSize, midSize));
+    brightness_.label.setBounds (brightCell.withSizeKeepingCentre (midSize, 16).withY (brightCell.getBottom() - 18));
+    auto dampCell = midRow.removeFromLeft (thirdW);
+    damping_.slider.setBounds (dampCell.withSizeKeepingCentre (midSize, midSize));
+    damping_.label.setBounds (dampCell.withSizeKeepingCentre (midSize, 16).withY (dampCell.getBottom() - 18));
+    auto posCell = midRow;
+    position_.slider.setBounds (posCell.withSizeKeepingCentre (midSize, midSize));
+    position_.label.setBounds (posCell.withSizeKeepingCentre (midSize, 16).withY (posCell.getBottom() - 18));
+
+    brightCentre_ = brightness_.slider.getBounds().getCentre().toFloat();
+    dampCentre_ = damping_.slider.getBounds().getCentre().toFloat();
+    posCentre_ = position_.slider.getBounds().getCentre().toFloat();
+
+    area.removeFromTop (20); // extra space for the +/- marks drawn in paint()
 
     // Five small attenuverter trim pots in one row.
     auto trimRow = area.removeFromTop (70);
@@ -136,12 +214,16 @@ void ChimeEditor::resized()
     const int tw = trimRow.getWidth() / 5;
     for (auto* k : trims)
     {
-        auto cell = trimRow.removeFromLeft (tw);
+        auto cell = trimRow.removeFromLeft (tw).reduced (18, 0);
         k->slider.setBounds (cell.withTrimmedBottom (14));
         k->label.setBounds (cell.removeFromBottom (14));
     }
 
     area.removeFromTop (14);
+
+    // Decorative jack row (Strum / V-Oct / In / Odd / Even).
+    jackRowArea_ = area.removeFromTop (42);
+    area.removeFromTop (16);
 
     auto utilRow = area.removeFromTop (24);
     modelLabel_.setBounds (utilRow.removeFromLeft (180));

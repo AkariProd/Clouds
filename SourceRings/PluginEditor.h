@@ -6,13 +6,15 @@
 #include "PluginProcessor.h"
 #include "ChimeLookAndFeel.h"
 
-/** Panel recreates the hardware's dark control layout — five knobs in a
-    pentagon-ish arrangement (Frequency top, Structure/Brightness either
-    side, Damping/Position below), a ring-shaped motif echoing the module's
-    own circular graphic, and the model/polyphony/strum controls grouped
-    below. Branded "Chime" / "SoulMade", per Mutable Instruments' own
-    derivative-works guidance — their CC-BY-SA panel layout and colour
-    scheme are recreated, their trademarked name and logo are not. */
+/** Panel recreates the hardware's real layout from the reference photo:
+    light cream panel, two big knobs (Frequency, Structure) over three
+    medium ones (Brightness, Damping, Position), a row of five small
+    attenuverter pots with "-/+" labels, dotted curved connector lines
+    pairing Frequency->Brightness and Structure->Position through Damping,
+    and a decorative jack row (Strum, V/Oct, In, Odd, Even). Branded
+    "Chime" / "SoulMade", per Mutable Instruments' own derivative-works
+    guidance — their CC-BY-SA panel layout and colour scheme are
+    recreated, their trademarked name and logo are not. */
 class ChimeEditor final : public juce::AudioProcessorEditor
 {
 public:
@@ -31,6 +33,7 @@ private:
     };
 
     void makeKnob (Knob& k, const juce::String& paramId, const juce::String& text, juce::Colour accent = {});
+    static void drawJackRow (juce::Graphics& g, juce::Rectangle<int> area, std::initializer_list<juce::String> labels);
 
     ChimeProcessor& proc_;
     rng::ChimeLookAndFeel lnf_;
@@ -44,6 +47,9 @@ private:
 
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> modelAtt_, strumAtt_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyAtt_;
+
+    juce::Rectangle<int> jackRowArea_;
+    juce::Point<float> freqCentre_, structCentre_, brightCentre_, dampCentre_, posCentre_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChimeEditor)
 };

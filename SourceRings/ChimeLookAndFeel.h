@@ -5,24 +5,24 @@
 namespace rng
 {
 
-/** Rings' hardware panel is black with white silkscreen and light-grey
-    knob caps — the inverse of Beads' white panel. Pointer-line knob style
-    (no JUCE ring/arc) to match, same accent-ring idea as Pebble for the
-    panel's own colour-coded marks. */
+/** Rings' real panel is a light cream/off-white (same family as Beads'
+    white panel, not the dark panel this file originally guessed before a
+    reference photo was available). Knobs are black-skirted with a glossy
+    white flat top and a thin black pointer line — not a solid cap. */
 class ChimeLookAndFeel final : public juce::LookAndFeel_V4
 {
 public:
     ChimeLookAndFeel()
     {
-        setColour (juce::Slider::textBoxTextColourId, juce::Colours::white);
-        setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0xff555555));
-        setColour (juce::Label::textColourId, juce::Colours::white);
-        setColour (juce::ComboBox::textColourId, juce::Colours::white);
-        setColour (juce::ComboBox::backgroundColourId, juce::Colour (0xff2a2a2a));
-        setColour (juce::ComboBox::outlineColourId, juce::Colour (0xff666666));
-        setColour (juce::ToggleButton::textColourId, juce::Colours::white);
-        setColour (juce::PopupMenu::backgroundColourId, juce::Colour (0xff2a2a2a));
-        setColour (juce::PopupMenu::textColourId, juce::Colours::white);
+        setColour (juce::Slider::textBoxTextColourId, juce::Colour (0xff1a1a1a));
+        setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0xffb5b5ac));
+        setColour (juce::Label::textColourId, juce::Colour (0xff1a1a1a));
+        setColour (juce::ComboBox::textColourId, juce::Colour (0xff1a1a1a));
+        setColour (juce::ComboBox::backgroundColourId, juce::Colours::white);
+        setColour (juce::ComboBox::outlineColourId, juce::Colour (0xff8a8a82));
+        setColour (juce::ToggleButton::textColourId, juce::Colour (0xff1a1a1a));
+        setColour (juce::PopupMenu::backgroundColourId, juce::Colours::white);
+        setColour (juce::PopupMenu::textColourId, juce::Colour (0xff1a1a1a));
     }
 
     void setKnobAccent (juce::Slider& s, juce::Colour c) { s.getProperties().set ("accent", (juce::int64) c.getARGB()); }
@@ -40,9 +40,9 @@ public:
         {
             const auto accent = juce::Colour ((juce::uint32) (juce::int64) slider.getProperties()["accent"]);
             juce::Path arc;
-            const float arcRadius = radius + 3.0f;
+            const float arcRadius = radius + 4.0f;
             arc.addCentredArc (centre.x, centre.y, arcRadius, arcRadius, 0.0f, rotaryStartAngle, rotaryEndAngle, true);
-            g.setColour (accent.withAlpha (0.55f));
+            g.setColour (accent.withAlpha (0.45f));
             g.strokePath (arc, juce::PathStrokeType (2.2f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
             juce::Path arcValue;
@@ -51,16 +51,29 @@ public:
             g.strokePath (arcValue, juce::PathStrokeType (2.8f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
         }
 
-        // Light-grey cap (hardware's knobs read light against the black panel).
-        g.setColour (juce::Colour (0xffd9d9d4));
+        // Black knurled skirt.
+        g.setColour (juce::Colour (0xff1c1c1c));
         g.fillEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
-        g.setColour (juce::Colour (0xff1a1a1a));
-        g.drawEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f, 1.0f);
+        for (int i = 0; i < 24; ++i)
+        {
+            const float a = (float) i / 24.0f * juce::MathConstants<float>::twoPi;
+            juce::Line<float> notch (centre.getPointOnCircumference (radius * 0.94f, a),
+                                      centre.getPointOnCircumference (radius, a));
+            g.setColour (juce::Colour (0xff0c0c0c));
+            g.drawLine (notch, 0.6f);
+        }
+
+        // Glossy white flat top cap, slightly inset.
+        const float capRadius = radius * 0.74f;
+        g.setColour (juce::Colours::white);
+        g.fillEllipse (centre.x - capRadius, centre.y - capRadius, capRadius * 2.0f, capRadius * 2.0f);
+        g.setColour (juce::Colour (0xffd8d8d2));
+        g.drawEllipse (centre.x - capRadius, centre.y - capRadius, capRadius * 2.0f, capRadius * 2.0f, 1.0f);
 
         juce::Path pointer;
-        const float pointerLength = radius * 0.78f;
-        const float pointerThickness = juce::jmax (2.0f, radius * 0.12f);
-        pointer.addRoundedRectangle (-pointerThickness * 0.5f, -radius * 0.92f, pointerThickness, pointerLength, pointerThickness * 0.4f);
+        const float pointerLength = capRadius * 0.85f;
+        const float pointerThickness = juce::jmax (1.6f, radius * 0.1f);
+        pointer.addRoundedRectangle (-pointerThickness * 0.5f, -capRadius * 0.9f, pointerThickness, pointerLength, pointerThickness * 0.4f);
         g.setColour (juce::Colour (0xff1a1a1a));
         g.fillPath (pointer, juce::AffineTransform::rotation (angle).translated (centre));
     }
@@ -72,12 +85,12 @@ public:
             juce::jmin (bounds.getWidth(), (float) button.getHeight()) - 2.0f,
             juce::jmin (bounds.getWidth(), (float) button.getHeight()) - 2.0f);
 
-        g.setColour (button.getToggleState() ? juce::Colour (0xff35c9ad) : juce::Colour (0xff444444));
+        g.setColour (button.getToggleState() ? juce::Colour (0xff29c7d6) : juce::Colour (0xffcfcfc8));
         g.fillEllipse (circle);
-        g.setColour (juce::Colour (0xff888888));
+        g.setColour (juce::Colour (0xff8a8a82));
         g.drawEllipse (circle, 1.5f);
 
-        g.setColour (juce::Colours::white);
+        g.setColour (juce::Colour (0xff1a1a1a));
         g.setFont (juce::Font (juce::FontOptions (11.0f)).boldened());
         g.drawText (button.getButtonText(), button.getLocalBounds(), juce::Justification::centredBottom);
     }
