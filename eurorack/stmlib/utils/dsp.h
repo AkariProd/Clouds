@@ -32,56 +32,66 @@
 
 #include "stmlib/stmlib.h"
 
+// MSVC has no __attribute__((always_inline)) — the forward declarations below
+// use it purely as a GCC/Clang hint, so make it a no-op on MSVC rather than a
+// parse error (which otherwise cascades into bogus "redefinition" errors on
+// every one of these functions).
+#if defined(_MSC_VER)
+#define STMLIB_ALWAYS_INLINE
+#else
+#define STMLIB_ALWAYS_INLINE __attribute__((always_inline))
+#endif
+
 namespace stmlib {
 
 inline int16_t Interpolate824(const int16_t* table, uint32_t phase)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline uint16_t Interpolate824(const uint16_t* table, uint32_t phase)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Interpolate824(const uint8_t* table, uint32_t phase)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline uint16_t Interpolate88(const uint16_t* table, uint16_t index)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Interpolate88(const int16_t* table, uint16_t index)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Interpolate1022(const int16_t* table, uint32_t phase)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Interpolate115(const int16_t* table, uint32_t phase)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Crossfade(
     const int16_t* table_a,
     const int16_t* table_b,
     uint32_t phase,
     uint16_t balance)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Crossfade(
     const uint8_t* table_a,
     const uint8_t* table_b,
     uint32_t phase,
     uint16_t balance)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Crossfade1022(
     const uint8_t* table_a,
     const uint8_t* table_b,
     uint32_t phase,
     uint16_t balance)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Crossfade115(
     const uint8_t* table_a,
     const uint8_t* table_b,
     uint16_t phase,
     uint16_t balance)
-  __attribute__((always_inline));
+  STMLIB_ALWAYS_INLINE;
 
 inline int16_t Mix(int16_t a, int16_t b, uint16_t balance) {
   return (a * (65535 - balance) + b * balance) >> 16;
