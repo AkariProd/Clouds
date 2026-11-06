@@ -135,6 +135,7 @@ set(PEBBLE_PLUGIN_SOURCES
     SourceBeads/PluginProcessor.cpp
     SourceBeads/PluginEditor.cpp
     SourceBeads/Parameters.cpp
+    SourceBeads/Panel.cpp
     SourceBeads/BeadsEngine.cpp)
 
 # The Beads DSP, verbatim from the firmware tree (dsp/ processor path only —
@@ -152,18 +153,6 @@ set(PEBBLE_DSP_SOURCES
     eurorack/stmlib/utils/random.cc)
 
 target_sources(Pebble PRIVATE ${PEBBLE_PLUGIN_SOURCES} ${PEBBLE_DSP_SOURCES})
-
-# Real photographic knob/button/jack textures cropped from the hardware's
-# own product photo, embedded as C++ byte arrays (BinaryData namespace) so
-# the plugin stays a single self-contained binary.
-juce_add_binary_data(PebbleAssets
-    SOURCES
-        SourceBeads/assets/knob_big.png
-        SourceBeads/assets/knob_small.png
-        SourceBeads/assets/button_round.png
-        SourceBeads/assets/jack.png)
-
-target_link_libraries(Pebble PRIVATE PebbleAssets)
 
 target_compile_definitions(Pebble PUBLIC
     _USE_MATH_DEFINES=1

@@ -1,9 +1,19 @@
 #pragma once
 
+#include <atomic>
+
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "BeadsEngine.h"
 #include "Parameters.h"
+
+/** Everything the panel animates, published from the audio thread. */
+struct PebblePanelState
+{
+    std::atomic<float> envIn  { 0.0f };
+    std::atomic<float> envOut { 0.0f };
+    std::atomic<float> inPeak { 0.0f };
+};
 
 class PebbleProcessor final : public juce::AudioProcessor
 {
@@ -35,6 +45,7 @@ public:
     void setStateInformation (const void*, int) override;
 
     juce::AudioProcessorValueTreeState apvts;
+    PebblePanelState panel;
 
 private:
     void pullParameters();

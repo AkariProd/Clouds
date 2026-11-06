@@ -1,6 +1,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <cmath>
+
 PebbleProcessor::PebbleProcessor()
     : juce::AudioProcessor (BusesProperties()
           .withInput ("Input", juce::AudioChannelSet::stereo(), true)
@@ -76,7 +78,33 @@ void PebbleProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Midi
     if (buffer.getNumChannels() < 2)
         return;
 
+    const int n = buffer.getNumSamples();
+
+    float inPeak = 0.0f, inSumSq = 0.0f;
+    for (int ch = 0; ch < 2; ++ch)
+    {
+        const auto* d = buffer.getReadPointer (ch);
+        for (int i = 0; i < n; ++i)
+        {
+            inPeak = juce::jmax (inPeak, std::abs (d[i]));
+            inSumSq += d[i] * d[i];
+        }
+    }
+
     engine_.process (buffer.getWritePointer (0), buffer.getWritePointer (1), buffer.getNumSamples());
+
+    float outSumSq = 0.0f;
+    for (int ch = 0; ch < 2; ++ch)
+    {
+        const auto* d = buffer.getReadPointer (ch);
+        for (int i = 0; i < n; ++i)
+            outSumSq += d[i] * d[i];
+    }
+
+    const float norm = n > 0 ? 1.0f / (float) (2 * n) : 0.0f;
+    panel.envIn.store  (std::sqrt (inSumSq * norm),  std::memory_order_relaxed);
+    panel.envOut.store (std::sqrt (outSumSq * norm), std::memory_order_relaxed);
+    panel.inPeak.store (inPeak, std::memory_order_relaxed);
 }
 
 juce::AudioProcessorEditor* PebbleProcessor::createEditor()
