@@ -15,7 +15,7 @@
 namespace bds::panel
 {
 
-constexpr float designW = 970.0f, designH = 294.0f;
+constexpr float designW = 970.0f, designH = 350.0f;
 
 /* ── Palette ─────────────────────────────────────────────────────────────── */
 namespace hue
@@ -55,9 +55,12 @@ constexpr float engineL = 338.0f, engineW = 150.0f; // ends 488
 constexpr float modX = 532.0f;                      // 4 faders, ends 732
 constexpr float mixX = 776.0f;                       // 3 faders, ends 926
 
-constexpr float statusY = 264.0f, statusRuleY = 248.0f;
+constexpr float statusY = 320.0f, statusRuleY = 304.0f;
 
 inline float faderX (float columnX, int i) { return columnX + faderStep * (0.5f + (float) i); }
+
+/** Full-width live grain-cloud visualizer band below the four columns. */
+inline juce::Rectangle<float> grainCloudRect() { return { contentL, 246.0f, contentR - contentL, 50.0f }; }
 
 /** Four-position vertical selector (MEDIA quality). */
 constexpr float listW = 110.0f, listRow = 17.0f;

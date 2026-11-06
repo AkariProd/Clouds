@@ -29,6 +29,11 @@ const char* kMixLabel[3] = { "FEEDBACK", "DRY/WET", "REVERB" };
 
 const char* kMediaLabel[4] = { "DIRTY TAPE", "CLEAN TAPE", "VINTAGE DIG", "DIGITAL" };
 
+constexpr int kDensityIdx = kTexture + 0;
+constexpr int kPitchIdx   = kTexture + 2;
+constexpr int kSizeIdx    = kTexture + 3;
+constexpr int kShapeIdx   = kTexture + 4;
+
 juce::String pct (float norm) { return juce::String (juce::roundToInt (norm * 100.0f)) + "%"; }
 
 juce::String pctSigned (float norm)
@@ -229,7 +234,107 @@ void PebbleEditor::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseW
     repaint();
 }
 
-void PebbleEditor::timerCallback() { repaint(); }
+void PebbleEditor::timerCallback()
+{
+    updateGrainCloud (1.0f / 30.0f);
+    repaint();
+}
+
+void PebbleEditor::updateGrainCloud (float dt)
+{
+    const bool frozen = ctls_[(size_t) kFreeze].param->getValue() > 0.5f;
+    const float density = ctls_[(size_t) kDensityIdx].param->getValue();
+    const float pitch    = ctls_[(size_t) kPitchIdx].param->getValue();
+    const float sizeAmt  = ctls_[(size_t) kSizeIdx].param->getValue();
+    const float shapeAmt = ctls_[(size_t) kShapeIdx].param->getValue();
+
+    for (auto& p : particles_)
+    {
+        if (! p.alive)
+            continue;
+        p.age += dt;
+        if (! frozen)
+            p.x += p.vx * dt;
+        if (p.age >= p.life || p.x > 1.05f)
+            p.alive = false;
+    }
+
+    if (! frozen)
+    {
+        // Density is perceptually exponential on hardware; square it so the
+        // low end stays sparse and the top end genuinely floods the strip.
+        const float spawnChance = density * density * 0.9f;
+        const int attempts = 3;
+        for (int i = 0; i < attempts; ++i)
+        {
+            if (rng_.nextFloat() > spawnChance)
+                continue;
+            for (auto& p : particles_)
+            {
+                if (p.alive)
+                    continue;
+                p.alive = true;
+                p.x = 0.0f;
+                p.y = rng_.nextFloat();
+                p.vx = 0.35f + rng_.nextFloat() * 0.5f;
+                p.hue = std::fmod (pitch + (rng_.nextFloat() - 0.5f) * 0.12f + 1.0f, 1.0f);
+                p.size = 0.35f + sizeAmt * 1.15f + rng_.nextFloat() * 0.25f;
+                p.age = 0.0f;
+                p.life = 1.4f + shapeAmt * 1.6f + rng_.nextFloat() * 0.6f;
+                break;
+            }
+        }
+    }
+}
+
+void PebbleEditor::drawGrainCloud (juce::Graphics& g) const
+{
+    auto r = grainCloudRect();
+
+    g.setColour (ink (0.08f));
+    g.fillRect (r);
+
+    const bool frozen = ctls_[(size_t) kFreeze].param->getValue() > 0.5f;
+    const float level = juce::jlimit (0.0f, 1.0f,
+        proc_.panel.envOut.load (std::memory_order_relaxed) * 3.0f);
+
+    {
+        juce::Graphics::ScopedSaveState save (g);
+        g.reduceClipRegion (r.getSmallestIntegerContainer());
+
+        for (const auto& p : particles_)
+        {
+            if (! p.alive)
+                continue;
+
+            const float lifeNorm = p.age / p.life;
+            float fade = 1.0f;
+            if (lifeNorm < 0.15f) fade = lifeNorm / 0.15f;
+            else if (lifeNorm > 0.75f) fade = (1.0f - lifeNorm) / 0.25f;
+            fade = juce::jlimit (0.0f, 1.0f, fade);
+
+            const float pulse = frozen ? 0.75f + 0.25f * std::sin (p.age * 3.0f) : 1.0f;
+            const float radius = (6.0f + p.size * 10.0f) * pulse;
+            const auto centre = juce::Point<float> (r.getX() + p.x * r.getWidth(),
+                                                      r.getY() + p.y * r.getHeight());
+
+            const float brightness = 0.55f + 0.45f * level;
+            const float alpha = fade * (0.35f + 0.5f * level);
+            auto colour = juce::Colour::fromHSV (p.hue, 0.72f, brightness, 1.0f);
+
+            juce::ColourGradient glow (colour.withAlpha (alpha), centre,
+                                        colour.withAlpha (0.0f), centre.translated (radius, 0.0f), true);
+            g.setGradientFill (glow);
+            g.fillEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
+        }
+    }
+
+    g.setColour (ink (0.22f));
+    g.drawRect (r, 1.0f);
+
+    tracked (g, "GRAIN CLOUD", { r.getX(), r.getY() - 15.0f, 150.0f, 11.0f }, 8.0f,
+             ink (0.5f), 0.6f, true);
+}
 
 /* ── Paint ───────────────────────────────────────────────────────────────── */
 
@@ -244,6 +349,8 @@ void PebbleEditor::paint (juce::Graphics& g)
     rule (g, rule1X, ruleTop, 1.0f, ruleBot - ruleTop, 0.11f);
     rule (g, rule2X, ruleTop, 1.0f, ruleBot - ruleTop, 0.11f);
     rule (g, rule3X, ruleTop, 1.0f, ruleBot - ruleTop, 0.11f);
+
+    drawGrainCloud (g);
 
     auto sectionTitle = [&g] (const char* t, float x, juce::Colour c)
     {
