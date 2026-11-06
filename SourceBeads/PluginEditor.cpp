@@ -159,7 +159,7 @@ PebbleEditor::PebbleEditor (PebbleProcessor& p)
     addAndMakeVisible (mediaLabel_);
     mediaAtt_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (proc_.apvts, bds::pid::media, mediaBox_);
 
-    setSize (490, 1180);
+    setSize (490, 1060);
 }
 
 PebbleEditor::~PebbleEditor()
@@ -251,21 +251,6 @@ void PebbleEditor::paint (juce::Graphics& g)
         }
     }
 
-    auto legendCentre = juce::Point<float> ((float) getWidth() / 2.0f, (float) densityLabelBounds.getBottom() + 26.0f);
-    g.setColour (juce::Colour (0xffcac8c0));
-    g.fillEllipse (legendCentre.x - 36.0f, legendCentre.y - 6.0f, 12.0f, 12.0f);
-    g.setColour (juce::Colour (0xff2a2a2a));
-    g.fillEllipse (legendCentre.x - 14.0f, legendCentre.y - 6.0f, 12.0f, 12.0f);
-    float barX = legendCentre.x + 10.0f;
-    const juce::Colour barColours[3] = { kCyan, kOrange, kMagenta };
-    const float barHeights[3] = { 6.0f, 10.0f, 14.0f };
-    for (int i = 0; i < 3; ++i)
-    {
-        g.setColour (barColours[(size_t) i]);
-        g.fillRect (barX, legendCentre.y + 7.0f - barHeights[(size_t) i], 4.0f, barHeights[(size_t) i]);
-        barX += 6.0f;
-    }
-
     drawDotted (g, timeAmount_.slider.getBounds().getCentre().toFloat().withY ((float) timeAmount_.slider.getBounds().getY()),
                 knobCentres_[0]);
     drawDotted (g, sizeAmount_.slider.getBounds().getCentre().toFloat().withY ((float) sizeAmount_.slider.getBounds().getY()),
@@ -345,7 +330,7 @@ void PebbleEditor::resized()
     density_.label.setBounds (topRow.withSizeKeepingCentre (160, 18).withY (topRow.getBottom() - 20));
 
     area.removeFromTop (4);
-    area.removeFromTop (54); // legend row drawn in paint()
+    area.removeFromTop (20);
 
     auto bigRow = area.removeFromTop (150);
     auto timeCell = bigRow.removeFromLeft (bigRow.getWidth() / 2);
@@ -382,7 +367,11 @@ void PebbleEditor::resized()
 
     area.removeFromTop (14);
 
-    auto trimRow = area.removeFromTop (60);
+    auto trimSection = area.removeFromTop (100);
+    auto pillCol = trimSection.removeFromRight (50);
+    outputGatePill_->setBounds (pillCol.withSizeKeepingCentre (44, 94).withY (trimSection.getY() + 2));
+
+    auto trimRow = trimSection.removeFromTop (60).withY (trimSection.getY() + 22);
     Knob* trims[] = { &feedback_, &dryWet_, &reverb_, &timeAmount_, &sizeAmount_, &shapeAmount_, &pitchAmount_ };
     const int tw = trimRow.getWidth() / 7;
     for (auto* k : trims)
@@ -391,7 +380,7 @@ void PebbleEditor::resized()
         k->slider.setBounds (cell.withSizeKeepingCentre (44, 44));
     }
 
-    area.removeFromTop (30);
+    area.removeFromTop (18);
 
     auto cvRow = area.removeFromTop (60);
     {
