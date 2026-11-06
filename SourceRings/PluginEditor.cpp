@@ -45,7 +45,7 @@ ChimeEditor::ChimeEditor (ChimeProcessor& p)
     strumAtt_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (proc_.apvts, rng::pid::strumMode, strumBox_);
     polyAtt_  = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc_.apvts, rng::pid::polyphony, polySlider_);
 
-    setSize (460, 700);
+    setSize (460, 620);
 }
 
 ChimeEditor::~ChimeEditor()
@@ -66,34 +66,6 @@ void ChimeEditor::makeKnob (Knob& k, const juce::String& paramId, const juce::St
     addAndMakeVisible (k.label);
 
     k.attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (proc_.apvts, paramId, k.slider);
-}
-
-void ChimeEditor::drawJackRow (juce::Graphics& g, juce::Rectangle<int> area, std::initializer_list<juce::String> labels)
-{
-    const int n = (int) labels.size();
-    if (n == 0)
-        return;
-    const int w = area.getWidth() / n;
-    int i = 0;
-    for (const auto& label : labels)
-    {
-        auto cell = area.withX (area.getX() + i * w).withWidth (w);
-        const float d = (float) juce::jmin (w - 10, 26);
-        auto circle = juce::Rectangle<float> (d, d).withCentre (cell.getCentre().toFloat());
-
-        g.setColour (juce::Colour (0xffcfcfc8));
-        g.fillEllipse (circle);
-        g.setColour (juce::Colour (0xff8a8a82));
-        g.drawEllipse (circle, 1.2f);
-        g.setColour (juce::Colour (0xff555550));
-        g.fillEllipse (circle.reduced (d * 0.32f));
-
-        g.setColour (kInk);
-        g.setFont (juce::Font (juce::FontOptions (9.0f)));
-        g.drawText (label, cell.withY (cell.getBottom() - 14).withHeight (14),
-                    juce::Justification::centred);
-        ++i;
-    }
 }
 
 void ChimeEditor::paint (juce::Graphics& g)
@@ -157,8 +129,6 @@ void ChimeEditor::paint (juce::Graphics& g)
         g.drawText ("+", b.withX (b.getRight()).withWidth (14), juce::Justification::centred);
     }
 
-    drawJackRow (g, jackRowArea_, { "STRUM", "V/OCT", "IN", "ODD", "EVEN" });
-
     auto badge = getLocalBounds().removeFromBottom (24).reduced (16, 2);
     g.setColour (juce::Colour (0xff777770));
     g.setFont (juce::Font (juce::FontOptions (10.0f)).boldened());
@@ -220,10 +190,6 @@ void ChimeEditor::resized()
     }
 
     area.removeFromTop (14);
-
-    // Decorative jack row (Strum / V-Oct / In / Odd / Even).
-    jackRowArea_ = area.removeFromTop (42);
-    area.removeFromTop (16);
 
     auto utilRow = area.removeFromTop (24);
     modelLabel_.setBounds (utilRow.removeFromLeft (180));

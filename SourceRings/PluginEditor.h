@@ -10,11 +10,13 @@
     light cream panel, two big knobs (Frequency, Structure) over three
     medium ones (Brightness, Damping, Position), a row of five small
     attenuverter pots with "-/+" labels, dotted curved connector lines
-    pairing Frequency->Brightness and Structure->Position through Damping,
-    and a decorative jack row (Strum, V/Oct, In, Odd, Even). Branded
-    "Chime" / "SoulMade", per Mutable Instruments' own derivative-works
-    guidance — their CC-BY-SA panel layout and colour scheme are
-    recreated, their trademarked name and logo are not. */
+    pairing Frequency->Brightness and Structure->Position through Damping.
+    No decorative jack row — a VST has no patch cables, so fake Strum/
+    V-Oct/In/Odd/Even jack circles that look clickable but aren't were
+    confusing rather than genuinely faithful. Branded "Chime" / "SoulMade",
+    per Mutable Instruments' own derivative-works guidance — their
+    CC-BY-SA panel layout and colour scheme are recreated, their
+    trademarked name and logo are not. */
 class ChimeEditor final : public juce::AudioProcessorEditor
 {
 public:
@@ -33,7 +35,6 @@ private:
     };
 
     void makeKnob (Knob& k, const juce::String& paramId, const juce::String& text, juce::Colour accent = {});
-    static void drawJackRow (juce::Graphics& g, juce::Rectangle<int> area, std::initializer_list<juce::String> labels);
 
     ChimeProcessor& proc_;
     rng::ChimeLookAndFeel lnf_;
@@ -48,7 +49,6 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> modelAtt_, strumAtt_;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> polyAtt_;
 
-    juce::Rectangle<int> jackRowArea_;
     juce::Point<float> freqCentre_, structCentre_, brightCentre_, dampCentre_, posCentre_;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChimeEditor)
