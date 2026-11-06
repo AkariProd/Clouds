@@ -34,6 +34,24 @@ constexpr int kPitchIdx   = kTexture + 2;
 constexpr int kSizeIdx    = kTexture + 3;
 constexpr int kShapeIdx   = kTexture + 4;
 
+// Grid placement (col, row) within each section's box() layout -- 3 wide on
+// row 0, 2 wide on row 1 for TEXTURE; 2x2 for MOD; 2 wide row 0 + 1 row 1
+// for MIX. Matches buildControls()/paint() iteration order above.
+constexpr int kTextureCol[5] = { 0, 1, 2, 0, 1 };
+constexpr int kTextureRow[5] = { 0, 0, 0, 1, 1 };
+constexpr int kModCol[4]     = { 0, 1, 0, 1 };
+constexpr int kModRow[4]     = { 0, 0, 1, 1 };
+constexpr int kMixCol[3]     = { 0, 1, 0 };
+constexpr int kMixRow[3]     = { 0, 0, 1 };
+
+juce::String numText (float norm) { return juce::String (juce::roundToInt (norm * 100.0f)); }
+
+juce::String numTextSigned (float norm)
+{
+    const float v = bds::attenuverterLaw (norm) * 100.0f;
+    return (v >= 0.0f ? "+" : "") + juce::String (juce::roundToInt (v));
+}
+
 juce::String pct (float norm) { return juce::String (juce::roundToInt (norm * 100.0f)) + "%"; }
 
 juce::String pctSigned (float norm)
@@ -84,7 +102,8 @@ void PebbleEditor::buildControls()
     };
 
     for (int i = 0; i < 5; ++i)
-        add (Kind::fader, kTextureId[i], faderBox (faderX (textureX, i)), faderTrack);
+        add (Kind::fader, kTextureId[i], boxRect (textureX, textureBoxW, textureBoxH, textureGapX,
+                                                   kTextureCol[i], kTextureRow[i]), 140.0f);
 
     add (Kind::latch,     pid::freeze,     freezeRect(),    0.0f, 2);
     add (Kind::momentary, pid::seed,       seedRect(),      0.0f, 2);
@@ -94,10 +113,12 @@ void PebbleEditor::buildControls()
     add (Kind::latch,     pid::outputGate, outputGateRect(),0.0f, 2);
 
     for (int i = 0; i < 4; ++i)
-        add (Kind::fader, kModId[i], faderBox (faderX (modX, i)), faderTrack);
+        add (Kind::fader, kModId[i], boxRect (modX, modBoxW, modBoxH, modGapX,
+                                               kModCol[i], kModRow[i]), 140.0f);
 
     for (int i = 0; i < 3; ++i)
-        add (Kind::fader, kMixId[i], faderBox (faderX (mixX, i)), faderTrack);
+        add (Kind::fader, kMixId[i], boxRect (mixX, mixBoxW, mixBoxH, mixGapX,
+                                               kMixCol[i], kMixRow[i]), 140.0f);
 }
 
 float PebbleEditor::scale() const { return (float) getWidth() / designW; }
@@ -364,9 +385,9 @@ void PebbleEditor::paint (juce::Graphics& g)
     /* ── Texture ─────────────────────────────────────────────────────────── */
     for (int i = 0; i < 5; ++i)
     {
-        auto* param = ctls_[(size_t) (kTexture + i)].param;
-        fader (g, faderX (textureX, i), param->getValue(), hue::texture,
-               kTextureLabel[i], pct (param->getValue()));
+        auto& c = ctls_[(size_t) (kTexture + i)];
+        box (g, c.hit, c.param->getValue(), hue::texture,
+             kTextureLabel[i], numText (c.param->getValue()), "%");
     }
 
     /* ── Engine ──────────────────────────────────────────────────────────── */
@@ -391,17 +412,17 @@ void PebbleEditor::paint (juce::Graphics& g)
     /* ── Mod ─────────────────────────────────────────────────────────────── */
     for (int i = 0; i < 4; ++i)
     {
-        auto* param = ctls_[(size_t) (kMod + i)].param;
-        fader (g, faderX (modX, i), param->getValue(), hue::mod,
-               kModLabel[i], pctSigned (param->getValue()), true);
+        auto& c = ctls_[(size_t) (kMod + i)];
+        box (g, c.hit, c.param->getValue(), hue::mod,
+             kModLabel[i], numTextSigned (c.param->getValue()), "%", true);
     }
 
     /* ── Mix ─────────────────────────────────────────────────────────────── */
     for (int i = 0; i < 3; ++i)
     {
-        auto* param = ctls_[(size_t) (kMix + i)].param;
-        fader (g, faderX (mixX, i), param->getValue(), hue::mix,
-               kMixLabel[i], pct (param->getValue()));
+        auto& c = ctls_[(size_t) (kMix + i)];
+        box (g, c.hit, c.param->getValue(), hue::mix,
+             kMixLabel[i], numText (c.param->getValue()), "%");
     }
 
     /* ── Status bar ──────────────────────────────────────────────────────── */

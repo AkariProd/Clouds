@@ -103,6 +103,7 @@ if(CLOUDIUS_PANEL_SHOT)
     target_sources(panel_shot PRIVATE
         tools/panel_shot.cpp ${CLOUDIUS_PLUGIN_SOURCES} ${CLOUDIUS_DSP_SOURCES})
     target_compile_definitions(panel_shot PRIVATE
+        _USE_MATH_DEFINES=1
         JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 TEST=1
         JUCE_STANDALONE_APPLICATION=1 JUCE_MODAL_LOOPS_PERMITTED=1)
     target_include_directories(panel_shot SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
@@ -180,3 +181,35 @@ target_link_libraries(Pebble PRIVATE
 # resolve our PDB (FL Studio's own crash reporter) can still be symbolicated
 # by hand (address - module base -> nearest preceding symbol in the map).
 target_link_options(Pebble_VST3 PRIVATE $<$<CONFIG:Debug>:/MAP>)
+
+# Dev tool: render the panel to PNGs without a host. -DPEBBLE_PANEL_SHOT=ON.
+# See DESIGN.md section 10 -- the prescribed "render, don't guess" loop:
+# build this target, open the PNGs, compare against DESIGN.md/design/refs/
+# before touching code, instead of launching FL Studio or a screenshot tool.
+option(PEBBLE_PANEL_SHOT "Build the offscreen Pebble panel renderer" OFF)
+if(PEBBLE_PANEL_SHOT)
+    juce_add_console_app(pebble_shot PRODUCT_NAME "pebble_shot" NEEDS_CURL FALSE)
+    target_sources(pebble_shot PRIVATE
+        tools/pebble_shot.cpp ${PEBBLE_PLUGIN_SOURCES} ${PEBBLE_DSP_SOURCES})
+    target_compile_definitions(pebble_shot PRIVATE
+        _USE_MATH_DEFINES=1
+        JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 TEST=1
+        JUCE_STANDALONE_APPLICATION=1 JUCE_MODAL_LOOPS_PERMITTED=1)
+    target_include_directories(pebble_shot SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
+    target_include_directories(pebble_shot PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/SourceBeads")
+    target_link_libraries(pebble_shot PRIVATE juce::juce_audio_utils juce::juce_dsp)
+endif()
+
+# Dev tool: live component-bounds/nesting inspector overlay (Ctrl+I in Debug
+# builds of the Standalone/plugin editor). Cloned as a plain git checkout
+# (not FetchContent -- its git-update step failed on this toolchain) into
+# modules/melatonin_inspector, gitignored, see
+# https://github.com/sudara/melatonin_inspector
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/modules/melatonin_inspector/CMakeLists.txt")
+    add_subdirectory(modules/melatonin_inspector)
+    target_link_libraries(Pebble PRIVATE melatonin_inspector)
+    target_compile_definitions(Pebble PRIVATE
+        PEBBLE_HAS_INSPECTOR=$<CONFIG:Debug>)
+else()
+    target_compile_definitions(Pebble PRIVATE PEBBLE_HAS_INSPECTOR=0)
+endif()

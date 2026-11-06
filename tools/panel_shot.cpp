@@ -19,10 +19,7 @@ void shoot (CloudiusProcessor& p, const juce::File& out)
     std::unique_ptr<juce::AudioProcessorEditor> editor (p.createEditor());
     editor->setSize ((int) cld::panel::designW, (int) cld::panel::designH);
 
-    juce::Image img (juce::Image::ARGB, editor->getWidth() * 2, editor->getHeight() * 2, true);
-    juce::Graphics g (img);
-    g.addTransform (juce::AffineTransform::scale (2.0f));
-    editor->paintEntireComponent (g, false);
+    auto img = editor->createComponentSnapshot (editor->getLocalBounds(), true, 2.0f);
 
     juce::FileOutputStream stream (out);
     stream.setPosition (0);

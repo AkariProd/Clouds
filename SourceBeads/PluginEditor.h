@@ -5,6 +5,10 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#if PEBBLE_HAS_INSPECTOR
+#include <melatonin_inspector/melatonin_inspector.h>
+#endif
+
 #include "Panel.h"
 #include "PluginProcessor.h"
 
@@ -79,6 +83,11 @@ private:
 
     PebbleProcessor& proc_;
     std::vector<Ctl> ctls_;
+
+#if PEBBLE_HAS_INSPECTOR
+    // Ctrl/Cmd+I toggles the overlay; see DESIGN.md section 10.
+    melatonin::Inspector inspector_ { *this };
+#endif
 
     int   dragIdx_ = -1;
     float dragStartNorm_ = 0.0f;

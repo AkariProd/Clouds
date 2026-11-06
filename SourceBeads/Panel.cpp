@@ -87,6 +87,60 @@ void fader (juce::Graphics& g, float cx, float norm, juce::Colour colour,
     text (g, readout, { cx - 32.0f, faderBot + 11.0f, 64.0f, 13.0f }, 9.5f, colour);
 }
 
+void box (juce::Graphics& g, juce::Rectangle<float> r, float norm, juce::Colour colour,
+          const juce::String& label, const juce::String& valueText, const juce::String& unitText,
+          bool fromCentre)
+{
+    constexpr float corner = 7.0f;
+
+    g.setColour (hue::paper.darker (0.025f));
+    g.fillRoundedRectangle (r, corner);
+
+    // Soft fill tracking the value (from the bottom, or from the centre for
+    // bipolar MOD boxes) -- position reads at a glance, the number confirms.
+    const float n = juce::jlimit (0.0f, 1.0f, norm);
+    const float origin = fromCentre ? 0.5f : 0.0f;
+    const float fillTop = r.getBottom() - r.getHeight() * juce::jmax (n, origin);
+    const float fillBot = r.getBottom() - r.getHeight() * juce::jmin (n, origin);
+    if (fillBot - fillTop > 0.5f)
+    {
+        auto clip = r.withTop (fillTop).withBottom (fillBot);
+        juce::Path fillPath;
+        const bool touchesBottom = fillBot >= r.getBottom() - 0.5f;
+        fillPath.addRoundedRectangle (clip.getX(), clip.getY(), clip.getWidth(), clip.getHeight(),
+                                       corner, corner, false, false, touchesBottom, touchesBottom);
+        g.setColour (colour.withAlpha (0.16f));
+        g.fillPath (fillPath);
+    }
+
+    g.setColour (ink (0.16f));
+    g.drawRoundedRectangle (r, corner, 1.0f);
+
+    // Corner-bracket accent, top-left and top-right.
+    g.setColour (colour.withAlpha (0.85f));
+    constexpr float bl = 7.0f;
+    for (float side : { 0.0f, 1.0f })
+    {
+        const float x = side == 0.0f ? r.getX() + 3.0f : r.getRight() - 3.0f;
+        const float dir = side == 0.0f ? 1.0f : -1.0f;
+        g.drawLine (x, r.getY() + 3.0f, x, r.getY() + 3.0f + bl, 1.3f);
+        g.drawLine (x, r.getY() + 3.0f, x + dir * bl, r.getY() + 3.0f, 1.3f);
+    }
+
+    auto valueArea = r.reduced (4.0f, 3.0f);
+    if (unitText.isNotEmpty())
+    {
+        auto unitArea = valueArea.removeFromBottom (valueArea.getHeight() * 0.3f);
+        text (g, unitText, unitArea, juce::jmin (8.5f, r.getHeight() * 0.16f), ink (0.4f),
+              juce::Justification::centred, false);
+    }
+    text (g, valueText, valueArea, juce::jmin (15.0f, r.getHeight() * 0.3f), ink (0.82f),
+          juce::Justification::centred, true);
+
+    text (g, label, { r.getX() - 8.0f, r.getBottom() + 3.0f, r.getWidth() + 16.0f, 12.0f },
+          7.6f, ink (0.5f), juce::Justification::centred, false);
+}
+
 void selector (juce::Graphics& g, juce::Rectangle<float> r, int selected,
                juce::Colour colour, const juce::StringArray& labels, float size)
 {
@@ -146,21 +200,24 @@ void selectorVertical (juce::Graphics& g, juce::Rectangle<float> r, int selected
 void button (juce::Graphics& g, juce::Rectangle<float> r, bool on,
              juce::Colour colour, const juce::String& label)
 {
+    constexpr float corner = 4.0f;
     if (on)
     {
         g.setColour (colour);
-        g.fillRect (r);
+        g.fillRoundedRectangle (r, corner);
         tracked (g, label, r.withY (r.getY() + (r.getHeight() - 8.0f) * 0.5f).withHeight (8.0f),
                  7.0f, hue::paper, 0.9f, false);
     }
     else
     {
+        g.setColour (hue::paper.darker (0.02f));
+        g.fillRoundedRectangle (r, corner);
         tracked (g, label, r.withY (r.getY() + (r.getHeight() - 8.0f) * 0.5f).withHeight (8.0f),
                  7.0f, ink (0.62f), 0.9f, false);
     }
 
-    g.setColour (on ? colour : ink (0.28f));
-    g.drawRect (r, 1.0f);
+    g.setColour (on ? colour : ink (0.22f));
+    g.drawRoundedRectangle (r, corner, 1.0f);
 }
 
 void toggleRow (juce::Graphics& g, juce::Rectangle<float> r, bool on,

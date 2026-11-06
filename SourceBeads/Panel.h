@@ -4,10 +4,12 @@
 
 /**
  * Flat drawing primitives and the panel grid for Pebble (after Mutable
- * Instruments' Beads). Same design language as Skýjað's panel: aluminium
- * and black print, mono tracked type, faders instead of knobs, colour
- * used only to mean "this control belongs to that section" or "this is a
- * live signal" - never decoration.
+ * Instruments' Beads). Following SourceBeads/DESIGN.md (dark theme, 8px
+ * grid, rounded tile controls, Inter type, snapshot dev-loop via
+ * tools/pebble_shot.cpp) EXCEPT: per explicit user instruction, keep our
+ * existing multi-colour section palette (teal/amber/violet/magenta, not
+ * DESIGN.md's single-amber-accent rule) and the current DSP-driven
+ * parameter/tile set (not DESIGN.md section 3's suggested tile list).
  *
  * Everything is expressed in a fixed design space; the editor applies one
  * scale transform, so layout constants double as hit-test geometry.
@@ -62,6 +64,22 @@ inline float faderX (float columnX, int i) { return columnX + faderStep * (0.5f 
 /** Full-width live grain-cloud visualizer band below the four columns. */
 inline juce::Rectangle<float> grainCloudRect() { return { contentL, 246.0f, contentR - contentL, 50.0f }; }
 
+/** Clean rectangular value boxes (TEXTURE/MOD/MIX), arranged in a small grid
+    per section instead of a single row of vertical faders -- big bold
+    number, a label below, a corner-bracket accent. Each section defines its
+    own box size/column count since it holds a different number of params;
+    boxRect() places one cell by (col, row). */
+constexpr float boxTopY = 40.0f, boxGapY = 14.0f, boxLabelH = 12.0f;
+inline juce::Rectangle<float> boxRect (float groupX, float boxW, float boxH, float gapX, int col, int row)
+{
+    return { groupX + (float) col * (boxW + gapX), boxTopY + (float) row * (boxH + boxGapY + boxLabelH),
+             boxW, boxH };
+}
+
+constexpr float textureBoxW = 72.0f, textureBoxH = 68.0f, textureGapX = 12.0f;
+constexpr float modBoxW = 92.0f, modBoxH = 68.0f, modGapX = 16.0f;
+constexpr float mixBoxW = 68.0f, mixBoxH = 68.0f, mixGapX = 12.0f;
+
 /** Four-position vertical selector (MEDIA quality). */
 constexpr float listW = 110.0f, listRow = 17.0f;
 inline juce::Rectangle<float> mediaRect() { return { engineL + (engineW - listW) * 0.5f, 92.0f, listW, listRow * 4.0f }; }
@@ -92,6 +110,13 @@ void rule (juce::Graphics&, float x, float y, float w, float h, float alpha = 0.
 void fader (juce::Graphics&, float cx, float norm, juce::Colour,
             const juce::String& label, const juce::String& readout,
             bool fromCentre = false);
+
+/** Clean rectangular value box: rounded rect, bold value + small unit,
+    corner-bracket accent, a soft fill tracking the value so position reads
+    at a glance without needing the number. */
+void box (juce::Graphics&, juce::Rectangle<float>, float norm, juce::Colour,
+          const juce::String& label, const juce::String& valueText,
+          const juce::String& unitText = {}, bool fromCentre = false);
 
 void selector (juce::Graphics&, juce::Rectangle<float>, int selected,
                juce::Colour, const juce::StringArray& labels, float size = 9.0f);
