@@ -175,3 +175,8 @@ target_link_libraries(Pebble PRIVATE
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags)
+
+# Debug-only: a linker MAP file so crash addresses from hosts that don't
+# resolve our PDB (FL Studio's own crash reporter) can still be symbolicated
+# by hand (address - module base -> nearest preceding symbol in the map).
+target_link_options(Pebble_VST3 PRIVATE $<$<CONFIG:Debug>:/MAP>)

@@ -49,6 +49,7 @@ public:
 
 private:
     void pullParameters();
+    void updateMedia (int numSamples);
 
     bds::BeadsEngine engine_;
 
@@ -70,6 +71,21 @@ private:
     std::atomic<float>* media_ = nullptr;
     std::atomic<float>* monoGrain_ = nullptr;
     std::atomic<float>* outputGate_ = nullptr;
+
+    // Debounces MEDIA changes: Processor::Configure() (fired from
+    // BeadsEngine::setMedia()) resets/reinitializes the delay engine on the
+    // audio thread every time the value changes. On hardware that's a
+    // physical switch a human can only flip so fast; a VST3 host sweeping
+    // the parameter through automation/a mapped control can call it dozens
+    // of times a second, which is almost certainly what crashed FL Studio
+    // here -- the vendored DSP was never exercised against reconfiguring
+    // that rapidly. Only actually apply a new media value once it's held
+    // steady for a short window, same effect a human flipping the switch
+    // would have, without touching the vendored engine code.
+    int pendingMedia_ = 3;
+    int appliedMedia_ = 3;
+    double mediaStableSamples_ = 0.0;
+    double mediaDebounceSamples_ = 2400.0; // ~50ms at 48kHz, rescaled in prepareToPlay
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PebbleProcessor)
 };

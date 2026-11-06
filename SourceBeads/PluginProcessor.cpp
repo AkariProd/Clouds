@@ -32,6 +32,10 @@ PebbleProcessor::PebbleProcessor()
 void PebbleProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     engine_.prepare (sampleRate, samplesPerBlock);
+    mediaDebounceSamples_ = 0.05 * sampleRate; // ~50ms, independent of host rate
+    pendingMedia_ = appliedMedia_ = juce::jlimit (0, 3, (int) media_->load());
+    mediaStableSamples_ = mediaDebounceSamples_; // apply immediately on first block
+    engine_.setMedia (appliedMedia_);
 }
 
 bool PebbleProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -57,9 +61,28 @@ void PebbleProcessor::pullParameters()
     engine_.setFreeze (freeze_->load() > 0.5f);
     engine_.setSeed (seed_->load() > 0.5f);
     engine_.setSeedLock (seedLock_->load() > 0.5f);
-    engine_.setMedia ((int) media_->load());
     engine_.setMonoGrain (monoGrain_->load() > 0.5f);
     engine_.setOutputGate (outputGate_->load() > 0.5f);
+}
+
+void PebbleProcessor::updateMedia (int numSamples)
+{
+    const int idx = juce::jlimit (0, 3, (int) media_->load());
+    if (idx != pendingMedia_)
+    {
+        pendingMedia_ = idx;
+        mediaStableSamples_ = 0.0;
+    }
+    else
+    {
+        mediaStableSamples_ += (double) numSamples;
+    }
+
+    if (pendingMedia_ != appliedMedia_ && mediaStableSamples_ >= mediaDebounceSamples_)
+    {
+        appliedMedia_ = pendingMedia_;
+        engine_.setMedia (appliedMedia_);
+    }
 }
 
 void PebbleProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
@@ -73,6 +96,7 @@ void PebbleProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Midi
             engine_.triggerSeedInput();
     }
 
+    updateMedia (buffer.getNumSamples());
     pullParameters();
 
     if (buffer.getNumChannels() < 2)
