@@ -39,7 +39,7 @@ ContourEditor::ContourEditor (ContourProcessor& p)
     addAndMakeVisible (modeLabel_);
     modeAtt_ = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment> (proc_.apvts, grd::pid::mode, modeBox_);
 
-    setSize (460, 660);
+    setSize (460, 580);
     startTimerHz (30);
 }
 
@@ -66,42 +66,6 @@ void ContourEditor::makeKnob (Knob& k, const juce::String& paramId, const juce::
 void ContourEditor::timerCallback()
 {
     repaint (ledArea_[0].getUnion (ledArea_[1]).getUnion (ledArea_[2]).expanded (4));
-}
-
-void ContourEditor::drawJackGrid (juce::Graphics& g, juce::Rectangle<int> area)
-{
-    auto bg = area.toFloat();
-    g.setColour (juce::Colour (0xffe2e0da));
-    g.fillRoundedRectangle (bg, 4.0f);
-
-    auto rows = area.reduced (8, 4);
-    auto trigRow = rows.removeFromTop (rows.getHeight() / 2);
-    auto accRow = rows;
-
-    auto drawRow = [&] (juce::Rectangle<int> row, const juce::String& label)
-    {
-        auto labelArea = row.removeFromLeft (44);
-        g.setColour (kInk);
-        g.setFont (juce::Font (juce::FontOptions (10.0f)).boldened());
-        g.drawText (label, labelArea, juce::Justification::centredLeft);
-
-        const int w = row.getWidth() / 3;
-        for (int i = 0; i < 3; ++i)
-        {
-            auto cell = row.removeFromLeft (w);
-            const float d = (float) juce::jmin (w - 10, 22);
-            auto circle = juce::Rectangle<float> (d, d).withCentre (cell.getCentre().toFloat());
-            g.setColour (juce::Colour (0xffcfcfc8));
-            g.fillEllipse (circle);
-            g.setColour (juce::Colour (0xff8a8a82));
-            g.drawEllipse (circle, 1.1f);
-            g.setColour (juce::Colour (0xff555550));
-            g.fillEllipse (circle.reduced (d * 0.32f));
-        }
-    };
-
-    drawRow (trigRow, "TRIG");
-    drawRow (accRow, "ACC");
 }
 
 void ContourEditor::paint (juce::Graphics& g)
@@ -153,8 +117,6 @@ void ContourEditor::paint (juce::Graphics& g)
         g.setColour (juce::Colour (0xff8a8a82));
         g.drawEllipse (ledArea_[i].toFloat(), 1.0f);
     }
-
-    drawJackGrid (g, jackGridArea_);
 
     auto badge = getLocalBounds().removeFromBottom (24).reduced (16, 2);
     g.setColour (juce::Colour (0xff777770));
@@ -237,6 +199,4 @@ void ContourEditor::resized()
     modeBox_.setBounds (modeControlRow.removeFromLeft (160));
 
     area.removeFromTop (10);
-
-    jackGridArea_ = area.removeFromTop (70);
 }

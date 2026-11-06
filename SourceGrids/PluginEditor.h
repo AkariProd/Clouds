@@ -11,9 +11,11 @@
     jack, so the slot is repurposed rather than left dead), RESET/TAP as
     one functional reset button, MAP X / MAP Y / CHAOS white-top knobs
     down the left side, three small cyan "FILL" (per-part density) knobs
-    with live trigger LEDs on the right, and a decorative TRIG/ACC jack
-    grid at the bottom. Branded "Contour" / "SoulMade" -- "topographic
-    drum sequencer" -> contour lines on a topographic map. */
+    with live trigger LEDs on the right. No decorative TRIG/ACC jack grid
+    -- a VST has no patch cables, so fake jacks that look clickable but
+    aren't were confusing rather than genuinely faithful. Branded
+    "Contour" / "SoulMade" -- "topographic drum sequencer" -> contour
+    lines on a topographic map. */
 class ContourEditor final : public juce::AudioProcessorEditor,
                              private juce::Timer
 {
@@ -34,7 +36,6 @@ private:
 
     void makeKnob (Knob& k, const juce::String& paramId, const juce::String& text, juce::Colour accent = {});
     void timerCallback() override;
-    static void drawJackGrid (juce::Graphics& g, juce::Rectangle<int> area);
 
     ContourProcessor& proc_;
     grd::ContourLookAndFeel lnf_;
@@ -52,7 +53,6 @@ private:
     juce::Label modeLabel_ { {}, "MODE" };
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> modeAtt_;
 
-    juce::Rectangle<int> jackGridArea_;
     juce::Rectangle<int> ledArea_[3];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ContourEditor)
