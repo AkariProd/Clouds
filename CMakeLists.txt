@@ -109,3 +109,67 @@ if(CLOUDIUS_PANEL_SHOT)
     target_include_directories(panel_shot PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
     target_link_libraries(panel_shot PRIVATE juce::juce_audio_utils juce::juce_dsp)
 endif()
+
+# ---------------------------------------------------------------------------
+# Chime — port of Mutable Instruments' Rings resonator.
+# ---------------------------------------------------------------------------
+
+juce_add_plugin(Chime
+    COMPANY_NAME            "SoulMade"
+    BUNDLE_ID               "com.soulmade.chime"
+    PLUGIN_MANUFACTURER_CODE Kcrp
+    PLUGIN_CODE             Chme
+    FORMATS                 VST3 AU Standalone
+    PRODUCT_NAME            "Chime"
+    DESCRIPTION             "Resonator (modal/string physical modeling)"
+    IS_SYNTH                FALSE
+    NEEDS_MIDI_INPUT        TRUE
+    NEEDS_MIDI_OUTPUT       FALSE
+    IS_MIDI_EFFECT          FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    VST3_CATEGORIES         Fx Modulation
+    AU_MAIN_TYPE            kAudioUnitType_Effect)
+
+set(CHIME_PLUGIN_SOURCES
+    SourceRings/PluginProcessor.cpp
+    SourceRings/PluginEditor.cpp
+    SourceRings/Parameters.cpp
+    SourceRings/ChimeEngine.cpp)
+
+# The Rings DSP, verbatim from the firmware tree — the six-model Part voice
+# engine + Strummer, minus hardware driver/UI/settings/calibration code and
+# the separate "string_synth" easter-egg mode (see ChimeEngine.h).
+set(CHIME_DSP_SOURCES
+    eurorack/rings/dsp/fm_voice.cc
+    eurorack/rings/dsp/part.cc
+    eurorack/rings/dsp/resonator.cc
+    eurorack/rings/dsp/string.cc
+    eurorack/rings/resources.cc
+    eurorack/stmlib/dsp/atan.cc
+    eurorack/stmlib/dsp/units.cc
+    eurorack/stmlib/utils/random.cc)
+
+target_sources(Chime PRIVATE ${CHIME_PLUGIN_SOURCES} ${CHIME_DSP_SOURCES})
+
+target_compile_definitions(Chime PUBLIC
+    _USE_MATH_DEFINES=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0
+    TEST=1)
+
+target_include_directories(Chime SYSTEM PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
+target_include_directories(Chime PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/SourceRings")
+
+target_link_libraries(Chime PRIVATE
+    juce::juce_audio_utils
+    juce::juce_dsp
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags)

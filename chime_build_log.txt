@@ -1,0 +1,59 @@
+MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
+
+  Checking File Globs
+  Chime_rc_lib.vcxproj -> C:\Users\produ\dev\skyjad\build\Chime_rc_lib.dir\Release\Chime_rc_lib.lib
+  Building VST3 manifest helper for Chime
+  -- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.26200.
+  -- Configuring done (0.0s)
+  -- Generating done (0.1s)
+  -- Build files have been written to: C:/Users/produ/dev/skyjad/build/vst3_helpers/Chime
+  MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
+  
+    vst3_helper.vcxproj -> C:\Users\produ\dev\skyjad\build\vst3_helpers\Chime\vst3_helper.exe
+  PluginProcessor.cpp
+  PluginEditor.cpp
+  ChimeEngine.cpp
+  juce_graphics_Sheenbidi.c
+  juce_graphics_libjpg_1.c
+  juce_graphics_libjpg_2.c
+  juce_graphics_libjpg_3.c
+  juce_graphics_libpng.c
+  juce_graphics_libwebp_dec.c
+  juce_graphics_libwebp_dsp_dec.c
+  juce_graphics_libwebp_dsp_dec_avx2.c
+  juce_graphics_libwebp_dsp_dec_sse41.c
+  juce_graphics_libwebp_dsp_enc.c
+  juce_graphics_libwebp_dsp_enc_avx2.c
+  juce_graphics_libwebp_dsp_enc_sse41.c
+  juce_graphics_libwebp_enc.c
+  juce_graphics_libwebp_sharpyuv.c
+  juce_graphics_libwebp_utils.c
+  juce_graphics_lunasvg.c
+  juce_core_zlib.c
+  juce_audio_formats_flac_1.c
+  juce_audio_formats_flac_2.c
+  juce_audio_formats_ogg.c
+  juce_audio_formats_opus.c
+  juce_audio_formats_opusfile.c
+  Chime.vcxproj -> C:\Users\produ\dev\skyjad\build\Chime_artefacts\Release\Chime_SharedCode.lib
+  Building Custom Rule C:/Users/produ/dev/skyjad/CMakeLists.txt
+  juce_audio_plugin_client_AAX.cpp
+  juce_audio_plugin_client_AAX_utils.cpp
+  juce_audio_plugin_client_ARA.cpp
+  juce_audio_plugin_client_LV2.cpp
+  juce_audio_plugin_client_Standalone.cpp
+  juce_audio_plugin_client_Unity.cpp
+  juce_audio_plugin_client_VST2.cpp
+  juce_audio_plugin_client_VST3.cpp
+     Creating library C:/Users/produ/dev/skyjad/build/Chime_artefacts/Release/VST3/Chime.lib and object C:/Users/produ/dev/skyjad/build/Chime_artefacts/Release/VST3/Chime.exp
+  Generating code
+  Finished generating code
+  Chime_VST3.vcxproj -> C:\Users\produ\dev\skyjad\build\Chime_artefacts\Release\VST3\Chime.vst3\Contents\x86_64-win\Chime.vst3
+  removing moduleinfo.json
+  creating C:/Users/produ/dev/skyjad/build/Chime_artefacts/Release/VST3/Chime.vst3/Contents/Resources/moduleinfo.json
+  -- Installing: C:\Program Files\Common Files/VST3/Chime.vst3
+  -- Installing: C:\Program Files\Common Files/VST3/Chime.vst3/Contents
+  -- Installing: C:\Program Files\Common Files/VST3/Chime.vst3/Contents/Resources
+  -- Installing: C:\Program Files\Common Files/VST3/Chime.vst3/Contents/Resources/moduleinfo.json
+  -- Installing: C:\Program Files\Common Files/VST3/Chime.vst3/Contents/x86_64-win
+  -- Installing: C:\Program Files\Common Files/VST3/Chime.vst3/Contents/x86_64-win/Chime.vst3
