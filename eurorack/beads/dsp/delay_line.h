@@ -101,42 +101,73 @@ struct Item<RESOLUTION_16_BIT, 2> {
 STMLIB_PACK_BEGIN
 template<>
 struct Item<RESOLUTION_12_BIT, 2> {
+  // NOTE: this used to be two `int16_t x : 12` bitfields. GCC/Clang's
+  // __attribute__((packed)) merges adjacent bitfields down to the minimum
+  // byte count (3 bytes here), but MSVC ties each bitfield's storage unit
+  // to its *declared* base type (int16_t -> 2 bytes) regardless of
+  // #pragma pack(1), so the struct silently came out as 4 bytes under
+  // MSVC instead of 3. That mismatch shrinks items_per_bank() in
+  // DelayLine, which shifts its bank-index math out of range of the
+  // 3-element items_[] array for every 12-bit media (Vintage Digital,
+  // Clean Tape) -- a guaranteed out-of-bounds read/crash, reproduced
+  // every time Vintage Digital was selected. Explicit byte packing avoids
+  // bitfield storage-unit rules entirely and is identical on every
+  // compiler.
   void Store(int i, FloatFrame s) {
-    l = stmlib::Clip16(static_cast<int32_t>(s.l * 32768.0f)) >> 4;
-    r = stmlib::Clip16(static_cast<int32_t>(s.r * 32768.0f)) >> 4;
+    const int16_t lv = stmlib::Clip16(static_cast<int32_t>(s.l * 32768.0f)) >> 4;
+    const int16_t rv = stmlib::Clip16(static_cast<int32_t>(s.r * 32768.0f)) >> 4;
+    bytes[0] = static_cast<uint8_t> (lv & 0xFF);
+    bytes[1] = static_cast<uint8_t> (((lv >> 8) & 0x0F) | ((rv & 0x0F) << 4));
+    bytes[2] = static_cast<uint8_t> ((rv >> 4) & 0xFF);
   }
   inline FloatFrame value(int i) const {
+    int16_t lv = static_cast<int16_t> (bytes[0] | ((bytes[1] & 0x0F) << 8));
+    int16_t rv = static_cast<int16_t> ((bytes[1] >> 4) | (bytes[2] << 4));
+    if (lv & 0x800) lv = static_cast<int16_t> (lv | 0xF000);
+    if (rv & 0x800) rv = static_cast<int16_t> (rv | 0xF000);
     FloatFrame result;
-    result.l = static_cast<float>(l) / 2048.0f;
-    result.r = static_cast<float>(r) / 2048.0f;
+    result.l = static_cast<float>(lv) / 2048.0f;
+    result.r = static_cast<float>(rv) / 2048.0f;
     return result;
   }
   enum { bundle_size = 1 };
-  int16_t l : 12;
-  int16_t r : 12;
+  uint8_t bytes[3];
 } STMLIB_PACKED_ATTR;
 STMLIB_PACK_END
 
 STMLIB_PACK_BEGIN
 template<>
 struct Item<RESOLUTION_12_BIT, 1> {
+  // Same MSVC bitfield-packing fix as Item<RESOLUTION_12_BIT, 2> above --
+  // see that struct's comment. "even"/"odd" replace "l"/"r" here (two
+  // time-adjacent mono samples instead of two channels), same 3-byte
+  // layout, same read-modify-write per half since they're written on
+  // separate Store() calls.
   void Store(int i, FloatFrame s) {
-    int16_t lr = \
-        stmlib::Clip16(static_cast<int32_t>((s.l + s.r) * 16384.0f)) >> 4;
+    const int16_t lr = static_cast<int16_t> (
+        stmlib::Clip16(static_cast<int32_t>((s.l + s.r) * 16384.0f)) >> 4);
     if (i) {
-      odd = lr;
+      bytes[1] = static_cast<uint8_t> ((bytes[1] & 0x0F) | ((lr & 0x0F) << 4));
+      bytes[2] = static_cast<uint8_t> ((lr >> 4) & 0xFF);
     } else {
-      even = lr;
+      bytes[0] = static_cast<uint8_t> (lr & 0xFF);
+      bytes[1] = static_cast<uint8_t> ((bytes[1] & 0xF0) | ((lr >> 8) & 0x0F));
     }
   }
   inline FloatFrame value(int i) const {
+    int16_t lr;
+    if (i) {
+      lr = static_cast<int16_t> (((bytes[1] >> 4) & 0x0F) | (bytes[2] << 4));
+    } else {
+      lr = static_cast<int16_t> (bytes[0] | ((bytes[1] & 0x0F) << 8));
+    }
+    if (lr & 0x800) lr = static_cast<int16_t> (lr | 0xF000);
     FloatFrame result;
-    result.l = result.r = static_cast<float>(i ? odd : even) / 2048.0f;
+    result.l = result.r = static_cast<float>(lr) / 2048.0f;
     return result;
   }
   enum { bundle_size = 2 };
-  int16_t odd : 12;
-  int16_t even : 12;
+  uint8_t bytes[3];
 } STMLIB_PACKED_ATTR;
 STMLIB_PACK_END
 
