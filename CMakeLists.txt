@@ -115,8 +115,8 @@ endif()
 # ---------------------------------------------------------------------------
 
 juce_add_plugin(Pebble
-    COMPANY_NAME            "KubiCorp"
-    BUNDLE_ID               "com.kubicorp.pebble"
+    COMPANY_NAME            "SoulMade"
+    BUNDLE_ID               "com.soulmade.pebble"
     PLUGIN_MANUFACTURER_CODE Kcrp
     PLUGIN_CODE             Pbbl
     FORMATS                 VST3 AU Standalone
