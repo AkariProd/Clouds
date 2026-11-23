@@ -36,7 +36,7 @@ juce_add_plugin(Cloudius
     PLUGIN_MANUFACTURER_CODE Sngm
     PLUGIN_CODE             Cldu
     FORMATS                 VST3 AU Standalone
-    PRODUCT_NAME            "Skýjað"
+    PRODUCT_NAME            "Skyjad"
     DESCRIPTION             "Granular texture processor"
     IS_SYNTH                FALSE
     NEEDS_MIDI_INPUT        TRUE
