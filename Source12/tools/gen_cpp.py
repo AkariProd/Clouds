@@ -1,6 +1,7 @@
 import json, re
 
 params = json.load(open('parameters.json'))
+byte_offset_map = json.load(open('byte_offset_map.json')) if __import__('os').path.exists('byte_offset_map.json') else {}
 
 SECTION_TITLES = {
     'OSC1': 'Oscillator 1', 'OSC2': 'Oscillator 2', 'OSC3': 'Oscillator 3', 'OSC4': 'Oscillator 4',
@@ -57,6 +58,8 @@ h.append('    ParamType type;')
 h.append('    int firstOptionIndex;  // index into kOptionStrings/kOptionCategories, or -1')
 h.append('    int numOptions;')
 h.append('    bool treeCategorized;  // show as a grouped/tree dropdown, not a flat list')
+h.append('    int dumpByteOffset;  // offset into the unpacked Program/Edit Buffer Dump, or -1 if unmapped')
+h.append('    int dumpByteOffsetMirror;  // second copy (Split Point/A-B Mode only), or -1')
 h.append('};')
 h.append('')
 h.append(f'constexpr int kNumParams = {len(params)};')
@@ -114,11 +117,14 @@ c.append('')
 c.append('const ParamDef kParams[kNumParams] = {')
 type_name = {'knob': 'ParamType::Knob', 'toggle': 'ParamType::Toggle', 'enum': 'ParamType::Enum'}
 for p in params:
-    c.append('    { %d, %d, "%s", "%s", "%s", %d, %d, %s, %d, %d, %s },' % (
+    bm = byte_offset_map.get(p['name'], {})
+    off = bm.get('byte_offset', -1)
+    offMirror = bm.get('byte_offset_mirror', -1)
+    c.append('    { %d, %d, "%s", "%s", "%s", %d, %d, %s, %d, %d, %s, %d, %d },' % (
         p['nrpnA'], p['nrpnB'] if p['nrpnB'] is not None else -1,
         p['id'], esc(p['name']), p['section'], p['min'], p['max'],
         type_name[p['type']], p['_optStart'], p['_optCount'],
-        'true' if p.get('categories') else 'false'))
+        'true' if p.get('categories') else 'false', off, offMirror))
 c.append('};')
 c.append('')
 c.append('const SectionDef kSections[kNumSections] = {')

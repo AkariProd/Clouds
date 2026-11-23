@@ -21,6 +21,8 @@ struct ParamDef
     int firstOptionIndex;  // index into kOptionStrings/kOptionCategories, or -1
     int numOptions;
     bool treeCategorized;  // show as a grouped/tree dropdown, not a flat list
+    int dumpByteOffset;  // offset into the unpacked Program/Edit Buffer Dump, or -1 if unmapped
+    int dumpByteOffsetMirror;  // second copy (Split Point/A-B Mode only), or -1
 };
 
 constexpr int kNumParams = 245;

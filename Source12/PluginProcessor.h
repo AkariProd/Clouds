@@ -66,12 +66,27 @@ public:
     void requestEditBufferDump();
     p12::SysexCaptureLog sysexLog;
 
+    // Full-preset sync: every ParamDef with a known dumpByteOffset (see
+    // Source12/tools/byte_offset_map.json, reverse-engineered against real
+    // hardware) gets set from the dump's raw bytes whenever one arrives --
+    // either because the user clicked "Sync Now" (requestEditBufferDump)
+    // or because an incoming Program Change was auto-detected. This is
+    // what actually answers "every knob should update when I change
+    // presets on the hardware".
+    std::atomic<int> fullSyncSequence { 0 };       // bumped after each applied dump
+    std::atomic<int> fullSyncAppliedCount { 0 };   // how many params the last sync touched
+    juce::String getLastSyncedPatchName() const;
+
 private:
     void parameterChanged(const juce::String& parameterID, float newValue) override;
     void sendNrpnOut(juce::MidiBuffer& out, int paramIndex, int rawValue, int samplePosition);
+    void applyFullDump(const std::vector<uint8_t>& dump);
 
     p12::NrpnDecoder nrpnDecoder;
     std::unordered_map<std::string, int> idToIndex;
+
+    mutable juce::CriticalSection patchNameLock;
+    juce::String lastSyncedPatchName;
 
     // Set while the processor itself is writing a parameter value that it
     // just decoded FROM incoming hardware MIDI, so the parameterChanged

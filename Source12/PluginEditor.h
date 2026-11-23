@@ -6,6 +6,7 @@
 #include "LookAndFeelP12.h"
 #include "MidiMonitorPanel.h"
 #include "SysexCapturePanel.h"
+#include "HardwareSyncPanel.h"
 
 // The content Component that actually holds every section, scrolled
 // inside the editor's Viewport.
@@ -41,6 +42,7 @@ private:
     Seer12PanelContent content;
     juce::Label titleLabel;
     MidiMonitorPanel midiMonitor;
+    HardwareSyncPanel hardwareSync;
     SysexCapturePanel sysexCapture;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Seer12Editor)

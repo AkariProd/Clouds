@@ -81,6 +81,60 @@ void Seer12Processor::requestEditBufferDump()
     pendingDumpRequest.store(true, std::memory_order_release);
 }
 
+void Seer12Processor::applyFullDump(const std::vector<uint8_t>& dump)
+{
+    int applied = 0;
+    suppressOutgoing.store(true, std::memory_order_relaxed);
+    for (int i = 0; i < p12::kNumParams; ++i)
+    {
+        const auto& def = p12::kParams[i];
+        if (def.dumpByteOffset < 0 || def.dumpByteOffset >= (int) dump.size())
+            continue;
+        auto* param = apvts.getParameter(def.id);
+        if (param == nullptr)
+            continue;
+
+        const int raw = juce::jlimit(def.minValue, def.maxValue, (int) dump[(size_t) def.dumpByteOffset]);
+        const float normalised = (def.type == p12::ParamType::Toggle)
+                                      ? (raw > 0 ? 1.0f : 0.0f)
+                                      : param->convertTo0to1((float) raw);
+        param->setValueNotifyingHost(normalised);
+        ++applied;
+    }
+    suppressOutgoing.store(false, std::memory_order_relaxed);
+
+    // Patch name: bytes 402-421, ASCII, per the manual's "Name Character
+    // 1-20" NRPN entries (byte offset confirmed against a known-working
+    // open-source Prophet 12 patch librarian, since the manual itself
+    // doesn't publish a byte-offset table for the dump the way it does
+    // for NRPN numbers).
+    juce::String name;
+    constexpr int kNamePos = 402, kNameLen = 20;
+    if ((int) dump.size() >= kNamePos + kNameLen)
+    {
+        for (int i = 0; i < kNameLen; ++i)
+        {
+            const char c = (char) dump[(size_t) (kNamePos + i)];
+            if (c >= 32 && c < 127)
+                name << c;
+        }
+        name = name.trim();
+    }
+    {
+        const juce::ScopedLock sl(patchNameLock);
+        lastSyncedPatchName = name;
+    }
+
+    fullSyncAppliedCount.store(applied, std::memory_order_relaxed);
+    fullSyncSequence.fetch_add(1, std::memory_order_relaxed);
+}
+
+juce::String Seer12Processor::getLastSyncedPatchName() const
+{
+    const juce::ScopedLock sl(patchNameLock);
+    return lastSyncedPatchName;
+}
+
 void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -129,13 +183,25 @@ void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
             bool isEditBuffer = false;
             int bank = -1, program = -1;
             if (p12::tryParseProphetDump(msg, unpacked, isEditBuffer, bank, program))
-                sysexLog.publish(std::move(unpacked), isEditBuffer, bank, program);
+            {
+                sysexLog.publish(unpacked, isEditBuffer, bank, program);
+                applyFullDump(unpacked);
+            }
             else
                 outgoing.addEvent(msg, metadata.samplePosition);  // some other sysex -- pass through
         }
+        else if (msg.isProgramChange())
+        {
+            // The hardware just recalled a different patch (requires its
+            // GLOBAL > MIDI Program Change Send to be on) -- NRPN alone
+            // never broadcasts the whole patch, so ask for a full dump to
+            // actually sync every knob instead of leaving them all stale.
+            pendingDumpRequest.store(true, std::memory_order_release);
+            outgoing.addEvent(msg, metadata.samplePosition);
+        }
         else
         {
-            // notes, pitch bend, (poly/channel) pressure, program change --
+            // notes, pitch bend, (poly/channel) pressure --
             // pass straight through so a pattern on this instrument track
             // actually plays the Prophet 12.
             outgoing.addEvent(msg, metadata.samplePosition);
