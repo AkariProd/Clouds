@@ -2,10 +2,11 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
 #include "SectionPanel.h"
+#include "OscillatorSection.h"
 #include "LookAndFeelP12.h"
 #include "MidiMonitorPanel.h"
 
-// The content Component that actually holds every SectionPanel, scrolled
+// The content Component that actually holds every section, scrolled
 // inside the editor's Viewport.
 class Seer12PanelContent : public juce::Component
 {
@@ -15,7 +16,10 @@ public:
     void paint(juce::Graphics&) override;
 
 private:
-    juce::OwnedArray<SectionPanel> sections;
+    // Owns both kinds of section; laid out together via PanelLayoutable so
+    // the flow-wrap code doesn't need to care which is which.
+    juce::OwnedArray<juce::Component> ownedSections;
+    std::vector<PanelLayoutable*> layoutPanels;
     static constexpr int kContentWidth = 1180;
     static constexpr int kMargin = 10;
 };

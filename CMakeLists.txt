@@ -244,7 +244,9 @@ set(SEER12_PLUGIN_SOURCES
     Source12/PluginEditor.cpp
     Source12/Parameters.cpp
     Source12/SectionPanel.cpp
+    Source12/OscillatorSection.cpp
     Source12/ParamControl.cpp
+    Source12/MultiOscParamControl.cpp
     Source12/LookAndFeelP12.cpp
     Source12/MidiMonitorPanel.cpp)
 

@@ -3,8 +3,19 @@
 
 Seer12PanelContent::Seer12PanelContent(juce::AudioProcessorValueTreeState& apvts)
 {
+    // One shared Oscillator section (with OSC 1-4 select buttons) replaces
+    // the 4 separate per-oscillator sections -- placed first.
+    auto* oscSection = new OscillatorSection("Oscillators", apvts);
+    ownedSections.add(oscSection);
+    layoutPanels.push_back(oscSection);
+    addAndMakeVisible(oscSection);
+
     for (const auto& sec : p12::kSections)
     {
+        if (std::strcmp(sec.id, "OSC1") == 0 || std::strcmp(sec.id, "OSC2") == 0
+            || std::strcmp(sec.id, "OSC3") == 0 || std::strcmp(sec.id, "OSC4") == 0)
+            continue;  // handled by the single OscillatorSection above
+
         std::vector<const p12::ParamDef*> defs;
         for (const auto& def : p12::kParams)
             if (std::strcmp(def.section, sec.id) == 0)
@@ -12,7 +23,8 @@ Seer12PanelContent::Seer12PanelContent(juce::AudioProcessorValueTreeState& apvts
         if (defs.empty())
             continue;
         auto* panel = new SectionPanel(sec.title, apvts, defs);
-        sections.add(panel);
+        ownedSections.add(panel);
+        layoutPanels.push_back(panel);
         addAndMakeVisible(panel);
     }
     setSize(kContentWidth, 100);  // real height computed by resized() below
@@ -28,7 +40,7 @@ void Seer12PanelContent::resized()
     // Simple left-to-right, top-to-bottom flow layout of section boxes,
     // wrapping to a new row when the next panel would overflow the width.
     int x = kMargin, y = kMargin, rowHeight = 0;
-    for (auto* panel : sections)
+    for (auto* panel : layoutPanels)
     {
         const int w = panel->getPreferredWidth();
         const int h = panel->getPreferredHeight();
@@ -40,7 +52,8 @@ void Seer12PanelContent::resized()
             rowHeight = 0;
         }
 
-        panel->setBounds(x, y, w, h);
+        if (auto* comp = dynamic_cast<juce::Component*>(panel))
+            comp->setBounds(x, y, w, h);
         x += w + kMargin;
         rowHeight = juce::jmax(rowHeight, h);
     }
