@@ -87,25 +87,45 @@ Arp Note/Velocity per-step arrays are excluded, no physical-knob equivalent).
   messages (`CH1  CC 99 =  0   -> Osc 1 Pitch = 120`-style). **Use this
   first** whenever MIDI "isn't working" — it immediately shows whether
   traffic is flowing in either direction before guessing at causes.
-- GUI: `SectionPanel` (titled box + wrapped knob grid) x22 non-oscillator
-  sections, plus ONE `OscillatorSection` (see below) for all 4 oscillators —
-  both implement `PanelLayoutable` so `Seer12PanelContent`'s flow-wrap layout
-  (scrolled via `Viewport`) treats them identically. `ParamControl` (one
-  knob/toggle/combo + label bound 1:1 to an APVTS parameter via a normal
-  Attachment, data-driven from `ParamDef`) is used for every non-oscillator
-  section; `LookAndFeelP12` is the shared original flat-cap knob skin, dark
-  panel with red section headers — not a copy of Sequential's own editor UI.
-- `OscillatorSection` + `MultiOscParamControl`: the Prophet 12's own panel
-  reuses ONE row of oscillator knobs across all 4 oscillators via OSC 1-4
-  select buttons (multi-select) rather than giving each oscillator its own
-  full knob row — Seer12 now mirrors that instead of showing 4 separate
-  "Oscillator N" sections. `MultiOscParamControl` is NOT a normal APVTS
-  Attachment; turning it manually calls `setValueNotifyingHost()` on every
-  *currently selected* oscillator's own independent parameter with the same
-  value (so OSC 1 + OSC 3 selected + turn "Pitch" retunes both in one move),
-  and displays whichever selected oscillator has the lowest index. This
-  still goes through the normal `parameterChanged` → outgoing-NRPN pipeline
-  per affected parameter, so hardware sync keeps working unchanged.
+- GUI: `SectionPanel` (titled box + wrapped knob grid) for single-instance
+  sections (Filters, Character, Feedback, Amp/Mix, Unison, Arp, Global...),
+  plus `MultiInstanceSection` for every section that has 2+ numbered
+  instances of the same thing (Oscillators, LFOs, Delays, Envelope 3/4, Mod
+  Matrix — see below). Both implement `PanelLayoutable` so
+  `Seer12PanelContent`'s flow-wrap layout (scrolled via `Viewport`) treats
+  them identically. `ParamControl` (one knob/toggle/combo + label bound 1:1
+  to an APVTS parameter via a normal Attachment, data-driven from
+  `ParamDef`) is used for every single-instance section's controls;
+  `LookAndFeelP12` is the shared original flat-cap knob skin, dark panel
+  with red section headers — not a copy of Sequential's own editor UI.
+- `MultiInstanceSection` + `MultiInstanceParamControl`: the Prophet 12's own
+  panel reuses ONE row of controls across several numbered instances via a
+  SELECT rather than giving each its own full knob row (OSC 1-4, LFO 1-4,
+  Delay 1-4, Envelope 3/4, Mod Matrix slots 1-16) — Seer12 mirrors that.
+  Field grouping is derived AUTOMATICALLY from the generated parameter names
+  (`MultiInstanceSection`'s constructor searches for `"<prefix> <N> "`
+  anywhere in each name, not just as a strict prefix — needed for names like
+  "Velocity to Env 3 Amt" where the instance number isn't at the start).
+  `MultiInstanceParamControl` is NOT a normal APVTS Attachment; turning it
+  manually calls `setValueNotifyingHost()` on every *currently selected*
+  instance's own independent parameter with the same value (so OSC 1 + OSC 3
+  selected + turn "Pitch" retunes both in one move), and displays whichever
+  selected instance has the lowest index. This still goes through the normal
+  `parameterChanged` → outgoing-NRPN pipeline per affected parameter, so
+  hardware sync keeps working unchanged.
+- `CategorizedCombo`: a tree-style dropdown (a button that pops a
+  `juce::PopupMenu` with per-category submenus) used for the Mod
+  Source/Destination and LFO/Envelope Destination fields, which have 28-99
+  options each (`ParamDef::treeCategorized == true`, option strings +
+  per-option categories generated into `kOptionStrings`/`kOptionCategories`
+  from `Source12/tools/mod_tables.py`, transcribed from the manual's
+  Appendix A/B — those fields are plain knobs in the main NRPN table, no
+  inline enum, so they needed a hand-built option list). NOT a
+  `juce::ComboBox`/`ComboBoxAttachment` (JUCE's ComboBox can't do submenus);
+  wired by hand with a `juce::Timer` poll, same pattern as
+  `MultiInstanceParamControl`, in both `ParamControl` and
+  `MultiInstanceParamControl` (Mod Matrix's shared Source/Destination knob
+  goes through `MultiInstanceParamControl`'s treeCombo path too).
 
 ## Status as of this session
 
@@ -116,6 +136,13 @@ Arp Note/Velocity per-step arrays are excluded, no physical-knob equivalent).
 - ✅ Oscillator section redesigned to one shared multi-select panel
   (OSC 1-4 buttons + one set of knobs), per user request — screenshot- and
   user-confirmed working (multi-select highlights correctly).
+- ✅ Same multi-select pattern generalized to LFOs, Delays, Envelope 3/4,
+  and the 16-slot Mod Matrix — screenshot-confirmed rendering correctly.
+  Clicking a tree dropdown (Mod Destination etc.) wasn't confirmed via
+  automated screenshot (PopupMenu doesn't show reliably under synthetic
+  input) — should be eyeballed once by hand.
+- ✅ Mod Source/Destination + LFO/Env Destination are now tree-categorized
+  dropdowns instead of raw 0-98 knobs, per user request.
 - ❌ **Still not yet verified against the real hardware.** User reported
   "MIDI isn't working" while it was still the effect version; the instrument
   conversion is the fix attempt but hasn't been tested with the P12
