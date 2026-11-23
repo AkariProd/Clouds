@@ -87,11 +87,25 @@ Arp Note/Velocity per-step arrays are excluded, no physical-knob equivalent).
   messages (`CH1  CC 99 =  0   -> Osc 1 Pitch = 120`-style). **Use this
   first** whenever MIDI "isn't working" — it immediately shows whether
   traffic is flowing in either direction before guessing at causes.
-- GUI: `SectionPanel` (titled box + wrapped knob grid) x26 sections, laid
-  out by `Seer12PanelContent` (simple flow-wrap, scrolled via `Viewport`),
-  `ParamControl` (one knob/toggle/combo + label, data-driven from
-  `ParamDef`), `LookAndFeelP12` (original flat-cap knob skin, dark panel
-  with red section headers — not a copy of Sequential's own editor UI).
+- GUI: `SectionPanel` (titled box + wrapped knob grid) x22 non-oscillator
+  sections, plus ONE `OscillatorSection` (see below) for all 4 oscillators —
+  both implement `PanelLayoutable` so `Seer12PanelContent`'s flow-wrap layout
+  (scrolled via `Viewport`) treats them identically. `ParamControl` (one
+  knob/toggle/combo + label bound 1:1 to an APVTS parameter via a normal
+  Attachment, data-driven from `ParamDef`) is used for every non-oscillator
+  section; `LookAndFeelP12` is the shared original flat-cap knob skin, dark
+  panel with red section headers — not a copy of Sequential's own editor UI.
+- `OscillatorSection` + `MultiOscParamControl`: the Prophet 12's own panel
+  reuses ONE row of oscillator knobs across all 4 oscillators via OSC 1-4
+  select buttons (multi-select) rather than giving each oscillator its own
+  full knob row — Seer12 now mirrors that instead of showing 4 separate
+  "Oscillator N" sections. `MultiOscParamControl` is NOT a normal APVTS
+  Attachment; turning it manually calls `setValueNotifyingHost()` on every
+  *currently selected* oscillator's own independent parameter with the same
+  value (so OSC 1 + OSC 3 selected + turn "Pitch" retunes both in one move),
+  and displays whichever selected oscillator has the lowest index. This
+  still goes through the normal `parameterChanged` → outgoing-NRPN pipeline
+  per affected parameter, so hardware sync keeps working unchanged.
 
 ## Status as of this session
 
@@ -99,8 +113,11 @@ Arp Note/Velocity per-step arrays are excluded, no physical-knob equivalent).
   crashing (verified via screenshot).
 - ✅ Converted from MIDI-effect (receive-only) to full instrument
   (bidirectional) per user request.
-- ❌ **Not yet verified against the real hardware.** User reported "MIDI
-  isn't working" while it was still the effect version; the instrument
+- ✅ Oscillator section redesigned to one shared multi-select panel
+  (OSC 1-4 buttons + one set of knobs), per user request — screenshot- and
+  user-confirmed working (multi-select highlights correctly).
+- ❌ **Still not yet verified against the real hardware.** User reported
+  "MIDI isn't working" while it was still the effect version; the instrument
   conversion is the fix attempt but hasn't been tested with the P12
   physically connected yet.
 - User will test next time they're at the studio with the Prophet 12
