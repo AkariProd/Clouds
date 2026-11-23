@@ -1,6 +1,22 @@
 import json, re
 from mod_tables import MOD_SOURCES, MOD_DESTINATIONS
 
+# "LFO N Sync Setting" / "Delay N Sync Setting" are enums whose option list
+# is spelled out ONLY on LFO1/Delay1's row, with "N>1" rows saying "(see
+# LFO 1/Delay 1 Sync Setting)" -- the auto-extraction can't resolve that
+# cross-reference, and even LFO1/Delay1's own inline list got truncated
+# because it spans a PDF page break. Hand-transcribed from the manual's
+# MIDI Implementation NRPN table (pages 81-84 in v1.2).
+LFO_SYNC_SETTING_OPTIONS = [
+    "32nd Triplet", "32nd", "16th Triplet", "16th", "8th Triplet", "8th",
+    "Quarter Triplet", "Quarter", "Dotted Quarter", "Half", "3 Quarters",
+    "4 Quarters", "6 Quarters", "8 Quarters", "16 Quarters", "32 Quarters",
+]
+DELAY_SYNC_SETTING_OPTIONS = [
+    "64th", "32nd", "Dotted 32nd", "16th", "Dotted 16th", "8th", "Dotted 8th",
+    "Quarter", "Dotted Quarter", "Half", "Dotted Half", "Whole",
+]
+
 entries = json.load(open('entries_final.json'))
 
 SECTION_RULES = [
@@ -124,6 +140,20 @@ for p in params:
     p['categories'] = [cat for _label, cat in table]
     p['min'] = 0
     p['max'] = len(table) - 1
+
+# Same idea for the Sync Setting enums (see comment above the option lists).
+for p in params:
+    if re.match(r'^LFO \d+ Sync Setting$', p['name']):
+        options = LFO_SYNC_SETTING_OPTIONS
+    elif re.match(r'^Delay \d+ Sync Setting$', p['name']):
+        options = DELAY_SYNC_SETTING_OPTIONS
+    else:
+        continue
+    p['type'] = 'enum'
+    p['options'] = options
+    p['categories'] = None
+    p['min'] = 0
+    p['max'] = len(options) - 1
 
 print('total GUI params:', len(params))
 from collections import Counter

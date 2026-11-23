@@ -1,0 +1,22 @@
+{
+  "delay1freq_high": {
+    "byte_offset": 96,
+    "last_new": 255,
+    "last_old": 0
+  },
+  "ocs1Shape_High": {
+    "byte_offset": 28,
+    "last_new": 127,
+    "last_old": 0
+  },
+  "ocs1Shape_Low": {
+    "byte_offset": 28,
+    "last_new": 0,
+    "last_old": 127
+  },
+  "pitch_high": {
+    "byte_offset": 0,
+    "last_new": 120,
+    "last_old": 0
+  }
+}
