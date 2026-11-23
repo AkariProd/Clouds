@@ -1,11 +1,11 @@
-#include "MultiOscParamControl.h"
+#include "MultiInstanceParamControl.h"
 #include "LookAndFeelP12.h"
 
-MultiOscParamControl::MultiOscParamControl(juce::AudioProcessorValueTreeState& apvtsIn,
-                                            const juce::String& fieldLabel,
-                                            std::array<const p12::ParamDef*, 4> defsPerOsc,
-                                            const std::array<bool, 4>& selectionIn)
-    : apvts(apvtsIn), defs(defsPerOsc), selection(selectionIn)
+MultiInstanceParamControl::MultiInstanceParamControl(juce::AudioProcessorValueTreeState& apvtsIn,
+                                                       const juce::String& fieldLabel,
+                                                       std::vector<const p12::ParamDef*> defsPerInstance,
+                                                       const std::vector<bool>& selectionIn)
+    : apvts(apvtsIn), defs(std::move(defsPerInstance)), selection(selectionIn)
 {
     for (auto* d : defs)
         if (d != nullptr) { representativeDef = d; break; }
@@ -24,6 +24,19 @@ MultiOscParamControl::MultiOscParamControl(juce::AudioProcessorValueTreeState& a
         toggle = std::make_unique<juce::ToggleButton>();
         toggle->onClick = [this] { if (!updatingFromCode) applyToSelected(toggle->getToggleState() ? 1.0f : 0.0f); };
         addAndMakeVisible(*toggle);
+    }
+    else if (representativeDef->type == p12::ParamType::Enum && representativeDef->treeCategorized)
+    {
+        treeCombo = std::make_unique<CategorizedCombo>();
+        juce::StringArray labels, categories;
+        for (int i = 0; i < representativeDef->numOptions; ++i)
+        {
+            labels.add(p12::kOptionStrings[representativeDef->firstOptionIndex + i]);
+            categories.add(p12::kOptionCategories[representativeDef->firstOptionIndex + i]);
+        }
+        treeCombo->setOptions(labels, categories);
+        treeCombo->onChange = [this] { if (!updatingFromCode) applyToSelected((float) treeCombo->getSelectedIndex()); };
+        addAndMakeVisible(*treeCombo);
     }
     else if (representativeDef->type == p12::ParamType::Enum)
     {
@@ -47,26 +60,26 @@ MultiOscParamControl::MultiOscParamControl(juce::AudioProcessorValueTreeState& a
     startTimerHz(15);
 }
 
-int MultiOscParamControl::firstSelectedWithDef() const
+int MultiInstanceParamControl::firstSelectedWithDef() const
 {
-    for (int i = 0; i < 4; ++i)
-        if (selection[(size_t) i] && defs[(size_t) i] != nullptr)
-            return i;
+    for (size_t i = 0; i < defs.size(); ++i)
+        if (selection[i] && defs[i] != nullptr)
+            return (int) i;
     return -1;
 }
 
-void MultiOscParamControl::applyToSelected(float realValue)
+void MultiInstanceParamControl::applyToSelected(float realValue)
 {
-    for (int i = 0; i < 4; ++i)
+    for (size_t i = 0; i < defs.size(); ++i)
     {
-        if (!selection[(size_t) i] || defs[(size_t) i] == nullptr)
+        if (!selection[i] || defs[i] == nullptr)
             continue;
-        if (auto* param = apvts.getParameter(defs[(size_t) i]->id))
+        if (auto* param = apvts.getParameter(defs[i]->id))
             param->setValueNotifyingHost(param->convertTo0to1(realValue));
     }
 }
 
-void MultiOscParamControl::refreshFromSelection()
+void MultiInstanceParamControl::refreshFromSelection()
 {
     if (representativeDef == nullptr)
         return;
@@ -96,12 +109,19 @@ void MultiOscParamControl::refreshFromSelection()
             if (auto* raw = apvts.getRawParameterValue(defs[(size_t) idx]->id))
                 combo->setSelectedId((int) raw->load() + 1, juce::dontSendNotification);
     }
+    else if (treeCombo)
+    {
+        treeCombo->setEnabled(enabled);
+        if (enabled)
+            if (auto* raw = apvts.getRawParameterValue(defs[(size_t) idx]->id))
+                treeCombo->setSelectedIndex((int) raw->load(), juce::dontSendNotification);
+    }
     updatingFromCode = false;
 }
 
-void MultiOscParamControl::paint(juce::Graphics&) {}
+void MultiInstanceParamControl::paint(juce::Graphics&) {}
 
-void MultiOscParamControl::resized()
+void MultiInstanceParamControl::resized()
 {
     auto b = getLocalBounds();
     auto labelArea = b.removeFromBottom(22);
@@ -113,4 +133,6 @@ void MultiOscParamControl::resized()
         toggle->setBounds(b.reduced(4, 10));
     else if (combo)
         combo->setBounds(b.reduced(2).withSizeKeepingCentre(b.getWidth() - 4, 22));
+    else if (treeCombo)
+        treeCombo->setBounds(b.reduced(2).withSizeKeepingCentre(b.getWidth() - 4, 22));
 }

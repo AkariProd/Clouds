@@ -54,13 +54,15 @@ h.append('    const char* section;')
 h.append('    int minValue;')
 h.append('    int maxValue;')
 h.append('    ParamType type;')
-h.append('    int firstOptionIndex;  // index into kOptionStrings, or -1')
+h.append('    int firstOptionIndex;  // index into kOptionStrings/kOptionCategories, or -1')
 h.append('    int numOptions;')
+h.append('    bool treeCategorized;  // show as a grouped/tree dropdown, not a flat list')
 h.append('};')
 h.append('')
 h.append(f'constexpr int kNumParams = {len(params)};')
 h.append('extern const ParamDef kParams[kNumParams];')
 h.append('extern const char* const kOptionStrings[];')
+h.append('extern const char* const kOptionCategories[];  // parallel to kOptionStrings, "" if uncategorized')
 h.append('extern const int kNumOptionStrings;')
 h.append('')
 h.append('struct SectionDef { const char* id; const char* title; };')
@@ -77,10 +79,16 @@ open('Parameters.h', 'w').write('\n'.join(h) + '\n')
 
 # ---- option strings flat table ----
 option_strings = []
+option_categories = []
 for p in params:
     if p['options']:
         p['_optStart'] = len(option_strings)
         option_strings.extend(p['options'])
+        cats = p.get('categories')
+        if cats:
+            option_categories.extend(cats)
+        else:
+            option_categories.extend([''] * len(p['options']))
         p['_optCount'] = len(p['options'])
     else:
         p['_optStart'] = -1
@@ -97,15 +105,20 @@ c.append('const char* const kOptionStrings[] = {')
 for o in option_strings:
     c.append(f'    "{esc(o)}",')
 c.append('};')
+c.append('const char* const kOptionCategories[] = {')
+for cat in option_categories:
+    c.append(f'    "{esc(cat)}",')
+c.append('};')
 c.append(f'const int kNumOptionStrings = {len(option_strings)};')
 c.append('')
 c.append('const ParamDef kParams[kNumParams] = {')
 type_name = {'knob': 'ParamType::Knob', 'toggle': 'ParamType::Toggle', 'enum': 'ParamType::Enum'}
 for p in params:
-    c.append('    { %d, %d, "%s", "%s", "%s", %d, %d, %s, %d, %d },' % (
+    c.append('    { %d, %d, "%s", "%s", "%s", %d, %d, %s, %d, %d, %s },' % (
         p['nrpnA'], p['nrpnB'] if p['nrpnB'] is not None else -1,
         p['id'], esc(p['name']), p['section'], p['min'], p['max'],
-        type_name[p['type']], p['_optStart'], p['_optCount']))
+        type_name[p['type']], p['_optStart'], p['_optCount'],
+        'true' if p.get('categories') else 'false'))
 c.append('};')
 c.append('')
 c.append('const SectionDef kSections[kNumSections] = {')

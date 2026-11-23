@@ -18,13 +18,15 @@ struct ParamDef
     int minValue;
     int maxValue;
     ParamType type;
-    int firstOptionIndex;  // index into kOptionStrings, or -1
+    int firstOptionIndex;  // index into kOptionStrings/kOptionCategories, or -1
     int numOptions;
+    bool treeCategorized;  // show as a grouped/tree dropdown, not a flat list
 };
 
 constexpr int kNumParams = 246;
 extern const ParamDef kParams[kNumParams];
 extern const char* const kOptionStrings[];
+extern const char* const kOptionCategories[];  // parallel to kOptionStrings, "" if uncategorized
 extern const int kNumOptionStrings;
 
 struct SectionDef { const char* id; const char* title; };

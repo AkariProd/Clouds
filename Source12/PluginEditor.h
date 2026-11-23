@@ -2,7 +2,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
 #include "SectionPanel.h"
-#include "OscillatorSection.h"
+#include "MultiInstanceSection.h"
 #include "LookAndFeelP12.h"
 #include "MidiMonitorPanel.h"
 

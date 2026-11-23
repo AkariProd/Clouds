@@ -1,4 +1,5 @@
 import json, re
+from mod_tables import MOD_SOURCES, MOD_DESTINATIONS
 
 entries = json.load(open('entries_final.json'))
 
@@ -101,8 +102,28 @@ for e in entries:
         'max': hi,
         'type': ptype,
         'options': options,
+        'categories': None,
         'seeRef': see_ref,
     })
+
+# Override: "Mod N Source", "Mod N Destination", "LFO N Destination" and
+# "Envelope 3/4 Destination" are plain knobs in the main table (the manual
+# only says "(see table of ... sources/destinations and values)" with no
+# inline enum) -- replace with the real dropdown list from Appendix A/B,
+# with per-option categories so the GUI renders a tree-grouped dropdown
+# instead of one 28- or 99-item flat list.
+for p in params:
+    if p['name'].endswith(' Source') and p['name'].startswith('Mod '):
+        table = MOD_SOURCES
+    elif p['name'].endswith(' Destination'):
+        table = MOD_DESTINATIONS
+    else:
+        continue
+    p['type'] = 'enum'
+    p['options'] = [label for label, _cat in table]
+    p['categories'] = [cat for _label, cat in table]
+    p['min'] = 0
+    p['max'] = len(table) - 1
 
 print('total GUI params:', len(params))
 from collections import Counter

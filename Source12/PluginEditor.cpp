@@ -3,18 +3,37 @@
 
 Seer12PanelContent::Seer12PanelContent(juce::AudioProcessorValueTreeState& apvts)
 {
-    // One shared Oscillator section (with OSC 1-4 select buttons) replaces
-    // the 4 separate per-oscillator sections -- placed first.
-    auto* oscSection = new OscillatorSection("Oscillators", apvts);
-    ownedSections.add(oscSection);
-    layoutPanels.push_back(oscSection);
-    addAndMakeVisible(oscSection);
+    // Groups of numbered instances (oscillators, LFOs, delays, envelopes,
+    // mod-matrix slots) each collapse into ONE section with select buttons
+    // instead of N separate full-knob sections -- mirrors how the Prophet
+    // 12's own panel reuses shared control rows across numbered instances.
+    auto addMultiInstance = [this, &apvts](const juce::String& title, std::vector<int> nums,
+                                            std::vector<juce::String> prefixes, const juce::String& buttonPrefix)
+    {
+        auto* sec = new MultiInstanceSection(title, apvts, nums, prefixes, buttonPrefix);
+        ownedSections.add(sec);
+        layoutPanels.push_back(sec);
+        addAndMakeVisible(sec);
+    };
+
+    addMultiInstance("Oscillators", { 1, 2, 3, 4 }, { "Osc" }, "OSC");
+    addMultiInstance("LFOs", { 1, 2, 3, 4 }, { "LFO" }, "LFO");
+    addMultiInstance("Delays", { 1, 2, 3, 4 }, { "Delay" }, "DELAY");
+    addMultiInstance("Envelope 3 / 4", { 3, 4 }, { "Envelope", "Env" }, "ENV");
+    addMultiInstance("Modulation Matrix", { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, { "Mod" }, "MOD");
+
+    const std::vector<const char*> handledElsewhere = {
+        "OSC1", "OSC2", "OSC3", "OSC4", "LFO1", "LFO2", "LFO3", "LFO4",
+        "DELAY1", "DELAY2", "DELAY3", "DELAY4", "ENV3", "ENV4", "MODMATRIX"
+    };
 
     for (const auto& sec : p12::kSections)
     {
-        if (std::strcmp(sec.id, "OSC1") == 0 || std::strcmp(sec.id, "OSC2") == 0
-            || std::strcmp(sec.id, "OSC3") == 0 || std::strcmp(sec.id, "OSC4") == 0)
-            continue;  // handled by the single OscillatorSection above
+        bool handled = false;
+        for (const auto* id : handledElsewhere)
+            if (std::strcmp(sec.id, id) == 0) { handled = true; break; }
+        if (handled)
+            continue;
 
         std::vector<const p12::ParamDef*> defs;
         for (const auto& def : p12::kParams)
