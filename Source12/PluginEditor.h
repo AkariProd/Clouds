@@ -1,0 +1,41 @@
+#pragma once
+#include <juce_audio_processors/juce_audio_processors.h>
+#include "PluginProcessor.h"
+#include "SectionPanel.h"
+#include "LookAndFeelP12.h"
+#include "MidiMonitorPanel.h"
+
+// The content Component that actually holds every SectionPanel, scrolled
+// inside the editor's Viewport.
+class Seer12PanelContent : public juce::Component
+{
+public:
+    Seer12PanelContent(juce::AudioProcessorValueTreeState& apvts);
+    void resized() override;
+    void paint(juce::Graphics&) override;
+
+private:
+    juce::OwnedArray<SectionPanel> sections;
+    static constexpr int kContentWidth = 1180;
+    static constexpr int kMargin = 10;
+};
+
+class Seer12Editor : public juce::AudioProcessorEditor
+{
+public:
+    explicit Seer12Editor(Seer12Processor&);
+    ~Seer12Editor() override;
+
+    void paint(juce::Graphics&) override;
+    void resized() override;
+
+private:
+    Seer12Processor& processor;
+    LookAndFeelP12 lookAndFeel;
+    juce::Viewport viewport;
+    Seer12PanelContent content;
+    juce::Label titleLabel;
+    MidiMonitorPanel midiMonitor;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Seer12Editor)
+};

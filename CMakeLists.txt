@@ -213,3 +213,59 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/modules/melatonin_inspector/CMakeLists.tx
 else()
     target_compile_definitions(Pebble PRIVATE PEBBLE_HAS_INSPECTOR=0)
 endif()
+
+# ---------------------------------------------------------------------------
+# Seer12 -- a hardware-synth live editor/controller. NOT a Sequential/DSI
+# product, not affiliated with them, and no vendored firmware: this is an
+# original GUI + MIDI-NRPN receiver only, built from the publicly published
+# Prophet 12 Module Operation Manual's MIDI Implementation chapter (NRPN
+# parameter table). No audio DSP, no panel graphics/trademark copied -- see
+# Source12/ for the generated parameter table and an original knob skin.
+
+juce_add_plugin(Seer12
+    COMPANY_NAME            "SoulMade"
+    BUNDLE_ID               "com.soulmade.seer12"
+    PLUGIN_MANUFACTURER_CODE Kcrp
+    PLUGIN_CODE             Sr12
+    FORMATS                 VST3 AU Standalone
+    PRODUCT_NAME            "Seer12"
+    DESCRIPTION             "Hardware synth live editor/controller (bidirectional MIDI NRPN sync)"
+    IS_SYNTH                TRUE
+    NEEDS_MIDI_INPUT        TRUE
+    NEEDS_MIDI_OUTPUT       TRUE
+    IS_MIDI_EFFECT          FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    VST3_CATEGORIES         Instrument Synth
+    AU_MAIN_TYPE            kAudioUnitType_MusicDevice)
+
+set(SEER12_PLUGIN_SOURCES
+    Source12/PluginProcessor.cpp
+    Source12/PluginEditor.cpp
+    Source12/Parameters.cpp
+    Source12/SectionPanel.cpp
+    Source12/ParamControl.cpp
+    Source12/LookAndFeelP12.cpp
+    Source12/MidiMonitorPanel.cpp)
+
+target_sources(Seer12 PRIVATE ${SEER12_PLUGIN_SOURCES})
+
+target_compile_definitions(Seer12 PUBLIC
+    _USE_MATH_DEFINES=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0)
+
+target_include_directories(Seer12 PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/Source12")
+
+target_link_libraries(Seer12 PRIVATE
+    juce::juce_audio_utils
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags)
+
+target_link_options(Seer12_VST3 PRIVATE $<$<CONFIG:Debug>:/MAP>)
