@@ -64,16 +64,14 @@ void Seer12Processor::sendNrpnOut(juce::MidiBuffer& out, int paramIndex, int raw
     out.addEvent(juce::MidiMessage::controllerEvent(ch, 99, (nrpn >> 7) & 0x7F), samplePosition);
     out.addEvent(juce::MidiMessage::controllerEvent(ch, 98, nrpn & 0x7F), samplePosition);
 
-    if (def.maxValue > 127)
-    {
-        const int clamped = juce::jlimit(0, 16383, rawValue);
-        out.addEvent(juce::MidiMessage::controllerEvent(ch, 6, (clamped >> 7) & 0x7F), samplePosition);
-        out.addEvent(juce::MidiMessage::controllerEvent(ch, 38, clamped & 0x7F), samplePosition);
-    }
-    else
-    {
-        out.addEvent(juce::MidiMessage::controllerEvent(ch, 6, juce::jlimit(0, 127, rawValue)), samplePosition);
-    }
+    // Always send the full 14-bit (MSB, LSB) pair, matching what the
+    // hardware itself transmits -- it always sends both bytes too, even for
+    // narrow-range params where the MSB is just a constant 0. Sending CC6
+    // alone (as this used to do for "narrow" params) left the MSB implicit,
+    // which the hardware can't be relied on to zero-fill correctly.
+    const int clamped = juce::jlimit(0, 16383, rawValue);
+    out.addEvent(juce::MidiMessage::controllerEvent(ch, 6, (clamped >> 7) & 0x7F), samplePosition);
+    out.addEvent(juce::MidiMessage::controllerEvent(ch, 38, clamped & 0x7F), samplePosition);
 
     midiLog.incrementSentOut();
 }

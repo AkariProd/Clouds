@@ -4,18 +4,18 @@
 
 namespace p12 {
 
-// Decodes the Prophet 12's transmitted NRPN stream (running-status CC99/98
-// for the parameter number, CC6/CC38 for the value) and reports finished
+// Decodes the Prophet 12's transmitted NRPN stream (CC99/98 for the
+// parameter number, CC6/CC38 for the value) and reports finished
 // (paramIndex, raw value) pairs. See the Prophet 12 Module Operation
 // Manual, "MIDI Implementation -> NRPN Messages".
 //
-// The hardware sends a CC6+CC38 pair for EVERY parameter, including narrow
-// (<=127) ones -- CC38 there is padding, not meaningful low-order data. So
-// which byte(s) actually carry the real value depends on the target
-// parameter's own range (def.maxValue), not on which CCs merely showed up:
-// treating CC38 as always-significant made every narrow-range knob snap to
-// its min/max, because (dataMSB << 7 | dataLSB) is wildly out of range for
-// e.g. a 0-120 or 0-19 parameter and gets clamped straight to an extreme.
+// The hardware always sends the full 4-message block (CC99, CC98, CC6,
+// CC38) for every single value change, with the real value as a standard
+// 14-bit (dataMSB << 7 | dataLSB) number -- CC6 (the MSB) reads as a
+// constant 0 for any parameter whose range fits under 128, which is by
+// far most of them, NOT because CC38 is unused padding. Only use CC6
+// alone as a shortcut once a complete (MSB, LSB) pair has actually been
+// seen for this parameter; always wait for both before completing.
 class NrpnDecoder
 {
 public:
@@ -27,19 +27,11 @@ public:
             case 98: nrpnLSB = value; haveLSB = true; resolveParam(); return false;
             case 6:
                 dataMSB = value;
-                if (!haveParam)
-                    return false;
-                if (isWide)
-                    return false;  // wait for CC38 to complete the 14-bit value
-                outParamIndex = paramIndex;
-                outRawValue = dataMSB;
-                return true;
+                return false;  // always wait for CC38 -- see class comment
             case 38:
                 dataLSB = value;
-                if (!haveParam || !isWide)
-                    return false;  // narrow params don't use the LSB -- CC38 here is
-                                    // just padding; ignore it rather than clobber the
-                                    // already-complete CC6 value with a bogus combined one
+                if (!haveParam)
+                    return false;
                 outParamIndex = paramIndex;
                 outRawValue = (dataMSB << 7) | dataLSB;
                 return true;
@@ -57,14 +49,12 @@ private:
         auto it = table.find(nrpn);
         if (it == table.end()) { haveParam = false; return; }
         paramIndex = it->second;
-        isWide = kParams[paramIndex].maxValue > 127;
         haveParam = true;
     }
 
     int nrpnMSB = 0, nrpnLSB = 0, dataMSB = 0, dataLSB = 0;
     bool haveMSB = false, haveLSB = false;
     bool haveParam = false;
-    bool isWide = false;
     int paramIndex = -1;
 };
 
