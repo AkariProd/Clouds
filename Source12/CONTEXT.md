@@ -143,29 +143,59 @@ Arp Note/Velocity per-step arrays are excluded, no physical-knob equivalent).
   input) — should be eyeballed once by hand.
 - ✅ Mod Source/Destination + LFO/Env Destination are now tree-categorized
   dropdowns instead of raw 0-98 knobs, per user request.
-- ❌ **Still not yet verified against the real hardware.** User reported
-  "MIDI isn't working" while it was still the effect version; the instrument
-  conversion is the fix attempt but hasn't been tested with the P12
-  physically connected yet.
-- User will test next time they're at the studio with the Prophet 12
-  connected. **Next step: load Seer12 on an FL Studio instrument track,
-  route its MIDI out to the P12, confirm GLOBAL > 7 is set to NRPN on the
-  hardware, and watch the MidiMonitorPanel strip for activity in both
-  directions.**
+- ✅ **Verified live against real hardware** (first time this got actually
+  tested with the physical P12 connected). Found and fixed real bugs along
+  the way:
+  - NRPN decoder was completely broken for narrow-range params (always
+    showed 0% or 100%) -- fixed, see NrpnDecoder.h: always wait for both
+    CC6+CC38 and combine as 14-bit, never trust CC6 alone.
+  - FL Studio plugin-type cache (Effect vs Instrument) needs manually
+    deleting `Documents\Image-Line\FL Studio\Presets\Plugin
+    database\Installed\Effects\VST3\Seer12.*` after any IS_SYNTH change,
+    FL won't auto-detect the category switch from a rescan alone.
+- ✅ **Full preset sync built and verified** (the actual original ask --
+  "every knob should have the correct value when I change presets"):
+  - `Source12/tools/auto_map_bytes.py` fully automates reverse-engineering
+    the undocumented SysEx Program/Edit Buffer Dump byte layout -- talks
+    directly to the hardware via raw `python-rtmidi` (no GUI involved),
+    sets each param via NRPN, requests a dump, diffs it against the
+    previous one. Mapped 245/245 parameters in under a minute.
+    `byte_offset_map.json` holds the result; `gen_cpp.py` bakes it
+    straight into each `ParamDef.dumpByteOffset`.
+  - `Seer12Processor::applyFullDump()` + the new `HardwareSyncPanel`
+    ("Sync Now" button) actually consume that map: one click (or an
+    auto-detected incoming Program Change) pulls a dump and sets all 245
+    on-screen controls at once, plus reads the patch name from bytes
+    402-421. **Confirmed working end-to-end against the real P12**: "Sync
+    Now" correctly synced 245 params and showed the real loaded patch
+    name ("NUm!erONE").
+  - This reverse-engineering also caught two real bugs baked into the
+    manual's own NRPN table (see git log on this branch for the
+    `build_params.py` override fixes): BPM and A/B Mode printed the same
+    NRPN number (288 really is A/B Mode; BPM dropped until its real
+    number is found, rather than ship a knob that silently corrupts A/B
+    Mode); and Delay N Pan's printed numbers (427-430) were off by two
+    (real numbers are 429-432).
 
 ## Known limitations / TODO
 
 - MIDI channel hardcoded to 1, not exposed in UI yet.
-- Program name characters (20 NRPNs) and Arp Note/Velocity step arrays
-  (66 NRPNs) are real parameters but have no panel UI (no physical knob
+- Program name characters (20 NRPNs, not individually controllable -- the
+  decoded name is shown read-only via HardwareSyncPanel instead) and Arp
+  Note/Velocity step arrays (66 NRPNs) have no panel UI (no physical knob
   equivalent on the hardware either).
 - Layer A vs Layer B (the P12 is dual-layer): both NRPN ranges map to the
   same on-screen knob; outgoing NRPN always transmits on the Layer A
   number. Fine for single-layer use; may need work for split/stack patches.
-- No automated tests; verification so far is "launch + screenshot +
-  eyeball". If something still doesn't sync once tested against real
-  hardware, the MidiMonitorPanel log is the first debugging tool to reach
-  for.
+- BPM has no working control at all right now -- its real NRPN number
+  was never found (see "Full preset sync" above). A brute-force scan of
+  nearby unclaimed numbers (296-300) didn't turn up a clean match either.
+  Low priority; revisit if the user wants global tempo control.
+- Delay 1/2 Pan vs NRPN 427/428 genuinely do nothing (confirmed, not a bug
+  on our end) -- only 429-432 are real, already fixed and in use.
+- No automated tests; verification is "launch + screenshot + eyeball",
+  now backed by actual hardware testing (both NRPN round-trip and the
+  full dump sync are confirmed live, not just assumed from code reading).
 
 ## Update this file
 
