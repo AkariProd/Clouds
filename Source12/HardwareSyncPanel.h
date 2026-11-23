@@ -21,6 +21,8 @@ private:
 
     Seer12Processor& proc;
     juce::TextButton syncButton { "Sync Now (pull full preset from hardware)" };
+    juce::TextButton reconnectButton { "Reconnect" };
+    juce::Label linkStatusLabel;
     juce::Label statusLabel;
 
     int lastSeenSequence = -1;

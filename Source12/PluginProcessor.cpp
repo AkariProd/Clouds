@@ -13,6 +13,13 @@ Seer12Processor::Seer12Processor()
         idToIndex[p12::kParams[i].id] = i;
         apvts.addParameterListener(p12::kParams[i].id, this);
     }
+
+    directLink.setOnDumpReceived([this](std::vector<uint8_t> dump, bool isEditBuffer, int bank, int program)
+    {
+        sysexLog.publish(dump, isEditBuffer, bank, program);
+        applyFullDump(dump);
+    });
+    directLink.autoConnect();  // best-effort; Settings panel shows status + Reconnect if this fails
 }
 
 Seer12Processor::~Seer12Processor()
@@ -78,7 +85,8 @@ void Seer12Processor::sendNrpnOut(juce::MidiBuffer& out, int paramIndex, int raw
 
 void Seer12Processor::requestEditBufferDump()
 {
-    pendingDumpRequest.store(true, std::memory_order_release);
+    directLink.sendDumpRequest();             // primary path -- bypasses host SysEx filtering
+    pendingDumpRequest.store(true, std::memory_order_release);  // fallback for hosts that DO pass SysEx
 }
 
 void Seer12Processor::changeProgram(int delta)
@@ -87,6 +95,9 @@ void Seer12Processor::changeProgram(int delta)
     int next = juce::jlimit(0, 127, cur + delta);
     currentProgramGuess.store(next, std::memory_order_relaxed);
     pendingProgramChange.store(next, std::memory_order_release);
+    // Give the hardware a moment to apply the PC before asking for a dump;
+    // a short async delay beats racing it in the very next audio block.
+    juce::Timer::callAfterDelay(120, [this] { directLink.sendDumpRequest(); });
 }
 
 void Seer12Processor::applyFullDump(const std::vector<uint8_t>& dump)
@@ -204,7 +215,14 @@ void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
             // GLOBAL > MIDI Program Change Send to be on) -- NRPN alone
             // never broadcasts the whole patch, so ask for a full dump to
             // actually sync every knob instead of leaving them all stale.
-            pendingDumpRequest.store(true, std::memory_order_release);
+            // Sent via the direct link (see DirectMidiLink.h) because the
+            // dump reply is SysEx, which most VST3 hosts -- FL Studio
+            // included -- won't deliver back to a hosted plugin at all.
+            // Hopped to the message thread: MidiOutput::sendMessageNow can
+            // block briefly on the underlying OS call, which processBlock
+            // (the audio thread) must never do.
+            juce::MessageManager::callAsync([this] { directLink.sendDumpRequest(); });
+            pendingDumpRequest.store(true, std::memory_order_release);  // fallback
             outgoing.addEvent(msg, metadata.samplePosition);
         }
         else

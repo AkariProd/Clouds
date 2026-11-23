@@ -26,7 +26,7 @@ void SettingsPanel::resized()
     auto b = getLocalBounds().reduced(8, 6);
     titleLabel.setBounds(b.removeFromTop(20));
     b.removeFromTop(2);
-    hardwareSync.setBounds(b.removeFromTop(60));
+    hardwareSync.setBounds(b.removeFromTop(80));
     b.removeFromTop(4);
     midiMonitor.setBounds(b.removeFromTop(92));
     b.removeFromTop(4);

@@ -17,7 +17,7 @@ public:
     void resized() override;
     void paint(juce::Graphics&) override;
 
-    static constexpr int kPreferredHeight = 92 + 60 + 64 + 40;
+    static constexpr int kPreferredHeight = 112 + 60 + 64 + 40;
 
 private:
     juce::Label titleLabel;

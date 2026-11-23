@@ -6,6 +6,18 @@ HardwareSyncPanel::HardwareSyncPanel(Seer12Processor& processor) : proc(processo
     syncButton.onClick = [this] { proc.requestEditBufferDump(); statusLabel.setText("Requesting...", juce::dontSendNotification); };
     addAndMakeVisible(syncButton);
 
+    reconnectButton.onClick = [this]
+    {
+        proc.directLink.autoConnect();
+        linkStatusLabel.setText(proc.directLink.statusText(), juce::dontSendNotification);
+    };
+    addAndMakeVisible(reconnectButton);
+
+    linkStatusLabel.setFont(juce::Font(juce::FontOptions(11.0f)));
+    linkStatusLabel.setColour(juce::Label::textColourId, LookAndFeelP12::textColour.withAlpha(0.7f));
+    linkStatusLabel.setText(proc.directLink.statusText(), juce::dontSendNotification);
+    addAndMakeVisible(linkStatusLabel);
+
     statusLabel.setFont(juce::Font(juce::FontOptions(12.0f)));
     statusLabel.setColour(juce::Label::textColourId, LookAndFeelP12::textColour.withAlpha(0.85f));
     statusLabel.setText("Not synced yet. Click Sync Now, or change presets on the hardware "
@@ -19,6 +31,8 @@ HardwareSyncPanel::HardwareSyncPanel(Seer12Processor& processor) : proc(processo
 
 void HardwareSyncPanel::timerCallback()
 {
+    linkStatusLabel.setText(proc.directLink.statusText(), juce::dontSendNotification);
+
     const int seq = proc.fullSyncSequence.load();
     if (seq == lastSeenSequence)
         return;
@@ -41,7 +55,12 @@ void HardwareSyncPanel::paint(juce::Graphics& g)
 void HardwareSyncPanel::resized()
 {
     auto b = getLocalBounds().reduced(8);
-    syncButton.setBounds(b.removeFromTop(26).removeFromLeft(280));
+    auto top = b.removeFromTop(26);
+    syncButton.setBounds(top.removeFromLeft(280));
+    top.removeFromLeft(8);
+    reconnectButton.setBounds(top.removeFromLeft(100));
+    top.removeFromLeft(8);
+    linkStatusLabel.setBounds(top);
     b.removeFromTop(4);
     statusLabel.setBounds(b);
 }

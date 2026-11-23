@@ -4,6 +4,7 @@
 #include "NrpnDecoder.h"
 #include "MidiActivityLog.h"
 #include "SysexCapture.h"
+#include "DirectMidiLink.h"
 #include <unordered_map>
 
 // Seer12 is an INSTRUMENT: load it on an FL Studio instrument track, play/
@@ -65,6 +66,13 @@ public:
     // arrives (polled from the editor's Timer, same pattern as midiLog).
     void requestEditBufferDump();
     p12::SysexCaptureLog sysexLog;
+
+    // Direct, host-bypassing connection to the Prophet 12's real MIDI
+    // ports, used only for the full-dump request/reply (see
+    // DirectMidiLink.h for why: most VST3 hosts, FL Studio included,
+    // don't pass SysEx through to/from a hosted plugin at all). Exposed
+    // so the Settings UI can show connection status and offer Reconnect.
+    p12::DirectMidiLink directLink;
 
     // Top-bar preset prev/next: sends a Program Change and immediately
     // follows it with a dump request (the hardware doesn't echo back a
