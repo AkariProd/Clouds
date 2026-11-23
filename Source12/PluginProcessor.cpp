@@ -81,6 +81,14 @@ void Seer12Processor::requestEditBufferDump()
     pendingDumpRequest.store(true, std::memory_order_release);
 }
 
+void Seer12Processor::changeProgram(int delta)
+{
+    int cur = currentProgramGuess.load(std::memory_order_relaxed);
+    int next = juce::jlimit(0, 127, cur + delta);
+    currentProgramGuess.store(next, std::memory_order_relaxed);
+    pendingProgramChange.store(next, std::memory_order_release);
+}
+
 void Seer12Processor::applyFullDump(const std::vector<uint8_t>& dump)
 {
     int applied = 0;
@@ -218,6 +226,14 @@ void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
 
     if (pendingDumpRequest.exchange(false, std::memory_order_acquire))
         outgoing.addEvent(p12::buildRequestEditBufferDump(), 0);
+
+    const int pc = pendingProgramChange.exchange(-1, std::memory_order_acquire);
+    if (pc >= 0)
+    {
+        const int ch = juce::jlimit(1, 16, midiChannel.load(std::memory_order_relaxed)) - 1;
+        outgoing.addEvent(juce::MidiMessage::programChange(ch + 1, pc), 0);
+        pendingDumpRequest.store(true, std::memory_order_release);  // follow up with a sync
+    }
 
     midi.swapWith(outgoing);
 }

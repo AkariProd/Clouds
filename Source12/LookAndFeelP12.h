@@ -22,6 +22,7 @@ public:
 
     static const juce::Colour panelBg;
     static const juce::Colour panelBgDark;
+    static const juce::Colour headerBg;
     static const juce::Colour sectionHeaderBg;
     static const juce::Colour accent;
     static const juce::Colour knobCap;

@@ -66,6 +66,13 @@ public:
     void requestEditBufferDump();
     p12::SysexCaptureLog sysexLog;
 
+    // Top-bar preset prev/next: sends a Program Change and immediately
+    // follows it with a dump request (the hardware doesn't echo back a
+    // Program Change it received FROM us, so the usual auto-sync-on-
+    // incoming-PC path in processBlock never fires for our own sends).
+    void changeProgram(int delta);
+    std::atomic<int> currentProgramGuess { 0 };  // 0-127, best-effort local tracking only
+
     // Full-preset sync: every ParamDef with a known dumpByteOffset (see
     // Source12/tools/byte_offset_map.json, reverse-engineered against real
     // hardware) gets set from the dump's raw bytes whenever one arrives --
@@ -104,6 +111,10 @@ private:
     // button click) and drained once per audio block in processBlock, which
     // actually queues the outgoing sysex request.
     std::atomic<bool> pendingDumpRequest { false };
+
+    // Set by changeProgram() (message thread); drained in processBlock to
+    // queue an outgoing Program Change. -1 means nothing pending.
+    std::atomic<int> pendingProgramChange { -1 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Seer12Processor)
 };

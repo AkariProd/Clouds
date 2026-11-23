@@ -81,26 +81,27 @@ void Seer12PanelContent::resized()
 }
 
 Seer12Editor::Seer12Editor(Seer12Processor& p)
-    : AudioProcessorEditor(&p), processor(p), content(p.apvts), midiMonitor(p), hardwareSync(p), sysexCapture(p)
+    : AudioProcessorEditor(&p), processor(p), content(p.apvts), topBar(p), settingsPanel(p)
 {
     setLookAndFeel(&lookAndFeel);
 
-    titleLabel.setText("SEER 12 -- Hardware Synth Editor", juce::dontSendNotification);
-    titleLabel.setFont(juce::Font(juce::FontOptions(18.0f, juce::Font::bold)));
-    titleLabel.setColour(juce::Label::textColourId, LookAndFeelP12::accent);
-    titleLabel.setJustificationType(juce::Justification::centredLeft);
-    addAndMakeVisible(titleLabel);
+    addAndMakeVisible(topBar);
+    topBar.onSettingsClicked = [this]
+    {
+        settingsOpen = !settingsOpen;
+        settingsPanel.setVisible(settingsOpen);
+        resized();
+    };
 
-    addAndMakeVisible(midiMonitor);
-    addAndMakeVisible(hardwareSync);
-    addAndMakeVisible(sysexCapture);
+    addChildComponent(settingsPanel);  // starts hidden
+    settingsPanel.setVisible(false);
 
     viewport.setViewedComponent(&content, false);
     viewport.setScrollBarsShown(true, false);
     addAndMakeVisible(viewport);
 
     setResizable(true, true);
-    setSize(1200, 1010);
+    setSize(1200, 900);
 }
 
 Seer12Editor::~Seer12Editor()
@@ -116,9 +117,8 @@ void Seer12Editor::paint(juce::Graphics& g)
 void Seer12Editor::resized()
 {
     auto b = getLocalBounds();
-    titleLabel.setBounds(b.removeFromTop(32).reduced(10, 4));
-    midiMonitor.setBounds(b.removeFromTop(92).reduced(8, 2));
-    hardwareSync.setBounds(b.removeFromTop(60).reduced(8, 2));
-    sysexCapture.setBounds(b.removeFromTop(64).reduced(8, 2));
+    topBar.setBounds(b.removeFromTop(48));
+    if (settingsOpen)
+        settingsPanel.setBounds(b.removeFromTop(SettingsPanel::kPreferredHeight));
     viewport.setBounds(b);
 }

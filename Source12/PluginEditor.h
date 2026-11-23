@@ -4,9 +4,8 @@
 #include "SectionPanel.h"
 #include "MultiInstanceSection.h"
 #include "LookAndFeelP12.h"
-#include "MidiMonitorPanel.h"
-#include "SysexCapturePanel.h"
-#include "HardwareSyncPanel.h"
+#include "TopBar.h"
+#include "SettingsPanel.h"
 
 // The content Component that actually holds every section, scrolled
 // inside the editor's Viewport.
@@ -40,10 +39,9 @@ private:
     LookAndFeelP12 lookAndFeel;
     juce::Viewport viewport;
     Seer12PanelContent content;
-    juce::Label titleLabel;
-    MidiMonitorPanel midiMonitor;
-    HardwareSyncPanel hardwareSync;
-    SysexCapturePanel sysexCapture;
+    TopBar topBar;
+    SettingsPanel settingsPanel;
+    bool settingsOpen = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Seer12Editor)
 };

@@ -2,6 +2,7 @@
 
 const juce::Colour LookAndFeelP12::panelBg        { 0xff2a2724 };
 const juce::Colour LookAndFeelP12::panelBgDark    { 0xff1f1c1a };
+const juce::Colour LookAndFeelP12::headerBg       { 0xff151312 };
 const juce::Colour LookAndFeelP12::sectionHeaderBg{ 0xff6b2f2a };
 const juce::Colour LookAndFeelP12::accent         { 0xffd97a3d };
 const juce::Colour LookAndFeelP12::knobCap        { 0xff3d3a36 };
