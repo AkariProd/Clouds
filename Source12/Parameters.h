@@ -23,7 +23,7 @@ struct ParamDef
     bool treeCategorized;  // show as a grouped/tree dropdown, not a flat list
 };
 
-constexpr int kNumParams = 246;
+constexpr int kNumParams = 245;
 extern const ParamDef kParams[kNumParams];
 extern const char* const kOptionStrings[];
 extern const char* const kOptionCategories[];  // parallel to kOptionStrings, "" if uncategorized

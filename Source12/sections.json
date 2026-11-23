@@ -288,8 +288,7 @@
     "arp_clock_divide",
     "arpeggiator_repeats",
     "arp_auto_latch",
-    "arp_lock_on_off",
-    "bpm"
+    "arp_lock_on_off"
   ],
   "GLOBAL": [
     "pitchbend_range_up",

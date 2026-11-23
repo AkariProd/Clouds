@@ -3,3 +3,4 @@ build/
 web/cloudius.wasm
 modules/
 Source12/captures/
+Source12/tools/__pycache__/

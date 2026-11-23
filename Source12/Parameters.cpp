@@ -5999,11 +5999,10 @@ const ParamDef kParams[kNumParams] = {
     { 293, 805, "arpeggiator_repeats", "Arpeggiator Repeats", "ARP", 0, 3, ParamType::Knob, -1, 0, false },
     { 294, 806, "arp_auto_latch", "Arp Auto Latch", "ARP", 0, 1, ParamType::Enum, 2870, 2, false },
     { 295, 807, "arp_lock_on_off", "Arp Lock On/Off", "ARP", 0, 1, ParamType::Enum, 2872, 2, false },
-    { 288, 800, "bpm", "BPM", "ARP", 30, 250, ParamType::Knob, -1, 0, false },
-    { 427, 939, "delay_1_pan", "Delay 1 Pan", "DELAY1", 0, 127, ParamType::Knob, -1, 0, false },
-    { 428, 940, "delay_2_pan", "Delay 2 Pan", "DELAY2", 0, 127, ParamType::Knob, -1, 0, false },
-    { 429, 941, "delay_3_pan", "Delay 3 Pan", "DELAY3", 0, 127, ParamType::Knob, -1, 0, false },
-    { 430, 942, "delay_4_pan", "Delay 4 Pan", "DELAY4", 0, 127, ParamType::Knob, -1, 0, false },
+    { 429, 941, "delay_1_pan", "Delay 1 Pan", "DELAY1", 0, 127, ParamType::Knob, -1, 0, false },
+    { 430, 942, "delay_2_pan", "Delay 2 Pan", "DELAY2", 0, 127, ParamType::Knob, -1, 0, false },
+    { 431, 943, "delay_3_pan", "Delay 3 Pan", "DELAY3", 0, 127, ParamType::Knob, -1, 0, false },
+    { 432, 944, "delay_4_pan", "Delay 4 Pan", "DELAY4", 0, 127, ParamType::Knob, -1, 0, false },
 };
 
 const SectionDef kSections[kNumSections] = {

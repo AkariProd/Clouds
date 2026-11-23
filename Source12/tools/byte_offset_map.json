@@ -1,22 +1,1956 @@
 {
-  "delay1freq_high": {
-    "byte_offset": 96,
-    "last_new": 255,
-    "last_old": 0
+  "A/B Mode": {
+    "byte_offset": 425,
+    "byte_offset_mirror": 937,
+    "max": 2,
+    "min": 0,
+    "nrpnA": 288
   },
-  "ocs1Shape_High": {
-    "byte_offset": 28,
+  "Air": {
+    "byte_offset": 76,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 80
+  },
+  "Arp Auto Latch": {
+    "byte_offset": 297,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 294
+  },
+  "Arp Clock Divide": {
+    "byte_offset": 298,
+    "last_new": 10,
+    "last_old": 6,
+    "max": 10,
+    "min": 0,
+    "nrpnA": 292
+  },
+  "Arp Lock On/Off": {
+    "byte_offset": 300,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 295
+  },
+  "Arpeggiator": {
+    "byte_offset": 296,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 289
+  },
+  "Arpeggiator Mode": {
+    "byte_offset": 294,
+    "last_new": 4,
+    "last_old": 2,
+    "max": 4,
+    "min": 0,
+    "nrpnA": 290
+  },
+  "Arpeggiator Range": {
+    "byte_offset": 295,
+    "last_new": 2,
+    "last_old": 0,
+    "max": 2,
+    "min": 0,
+    "nrpnA": 291
+  },
+  "Arpeggiator Repeats": {
+    "byte_offset": 299,
+    "last_new": 3,
+    "last_old": 0,
+    "max": 3,
+    "min": 0,
+    "nrpnA": 293
+  },
+  "Decimate": {
+    "byte_offset": 79,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 83
+  },
+  "Delay 1 Amount": {
+    "byte_offset": 104,
     "last_new": 127,
-    "last_old": 0
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 190
   },
-  "ocs1Shape_Low": {
+  "Delay 1 Feedback": {
+    "byte_offset": 108,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 191
+  },
+  "Delay 1 Filter Mode": {
+    "byte_offset": 124,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 194
+  },
+  "Delay 1 Highpass Filter": {
+    "byte_offset": 120,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 193
+  },
+  "Delay 1 Lowpass Filter": {
+    "byte_offset": 116,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 192
+  },
+  "Delay 1 Pan": {
+    "byte_offset": 164,
+    "last_new": 127,
+    "last_old": 64,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 429
+  },
+  "Delay 1 Sync": {
+    "byte_offset": 112,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 189
+  },
+  "Delay 1 Sync Setting": {
+    "byte_offset": 100,
+    "last_new": 11,
+    "last_old": 7,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 188
+  },
+  "Delay 1 Time": {
+    "byte_offset": 96,
+    "last_new": 0,
+    "last_old": 255,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 187
+  },
+  "Delay 2 Amount": {
+    "byte_offset": 105,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 198
+  },
+  "Delay 2 Feedback": {
+    "byte_offset": 109,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 199
+  },
+  "Delay 2 Filter Mode": {
+    "byte_offset": 125,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 202
+  },
+  "Delay 2 Highpass Filter": {
+    "byte_offset": 121,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 201
+  },
+  "Delay 2 Lowpass Filter": {
+    "byte_offset": 117,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 200
+  },
+  "Delay 2 Pan": {
+    "byte_offset": 165,
+    "last_new": 127,
+    "last_old": 64,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 430
+  },
+  "Delay 2 Sync": {
+    "byte_offset": 113,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 197
+  },
+  "Delay 2 Sync Setting": {
+    "byte_offset": 101,
+    "last_new": 11,
+    "last_old": 9,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 196
+  },
+  "Delay 2 Time": {
+    "byte_offset": 97,
+    "last_new": 255,
+    "last_old": 240,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 195
+  },
+  "Delay 3 Amount": {
+    "byte_offset": 106,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 206
+  },
+  "Delay 3 Feedback": {
+    "byte_offset": 110,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 207
+  },
+  "Delay 3 Filter Mode": {
+    "byte_offset": 126,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 210
+  },
+  "Delay 3 Highpass Filter": {
+    "byte_offset": 122,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 209
+  },
+  "Delay 3 Lowpass Filter": {
+    "byte_offset": 118,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 208
+  },
+  "Delay 3 Pan": {
+    "byte_offset": 166,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 431
+  },
+  "Delay 3 Sync": {
+    "byte_offset": 114,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 205
+  },
+  "Delay 3 Sync Setting": {
+    "byte_offset": 102,
+    "last_new": 11,
+    "last_old": 5,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 204
+  },
+  "Delay 3 Time": {
+    "byte_offset": 98,
+    "last_new": 255,
+    "last_old": 80,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 203
+  },
+  "Delay 4 Amount": {
+    "byte_offset": 107,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 214
+  },
+  "Delay 4 Feedback": {
+    "byte_offset": 111,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 215
+  },
+  "Delay 4 Filter Mode": {
+    "byte_offset": 127,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 218
+  },
+  "Delay 4 Highpass Filter": {
+    "byte_offset": 123,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 217
+  },
+  "Delay 4 Lowpass Filter": {
+    "byte_offset": 119,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 216
+  },
+  "Delay 4 Pan": {
+    "byte_offset": 167,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 432
+  },
+  "Delay 4 Sync": {
+    "byte_offset": 115,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 213
+  },
+  "Delay 4 Sync Setting": {
+    "byte_offset": 103,
+    "last_new": 11,
+    "last_old": 3,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 212
+  },
+  "Delay 4 Time": {
+    "byte_offset": 99,
+    "last_new": 255,
+    "last_old": 60,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 211
+  },
+  "Distortion Amount": {
+    "byte_offset": 254,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 101
+  },
+  "Drive": {
+    "byte_offset": 80,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 84
+  },
+  "Envelope 3 Amt": {
+    "byte_offset": 170,
+    "last_new": 254,
+    "last_old": 117,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 125
+  },
+  "Envelope 3 Attack": {
+    "byte_offset": 182,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 128
+  },
+  "Envelope 3 Decay": {
+    "byte_offset": 186,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 129
+  },
+  "Envelope 3 Delay": {
+    "byte_offset": 178,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 127
+  },
+  "Envelope 3 Destination": {
+    "byte_offset": 196,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 133
+  },
+  "Envelope 3 Release": {
+    "byte_offset": 194,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 131
+  },
+  "Envelope 3 Repeat": {
+    "byte_offset": 200,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 132
+  },
+  "Envelope 3 Sustain": {
+    "byte_offset": 190,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 130
+  },
+  "Envelope 4 Amt": {
+    "byte_offset": 171,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 136
+  },
+  "Envelope 4 Attack": {
+    "byte_offset": 183,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 139
+  },
+  "Envelope 4 Decay": {
+    "byte_offset": 187,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 140
+  },
+  "Envelope 4 Delay": {
+    "byte_offset": 179,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 138
+  },
+  "Envelope 4 Destination": {
+    "byte_offset": 197,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 144
+  },
+  "Envelope 4 Release": {
+    "byte_offset": 195,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 142
+  },
+  "Envelope 4 Repeat": {
+    "byte_offset": 201,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 143
+  },
+  "Envelope 4 Sustain": {
+    "byte_offset": 191,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 141
+  },
+  "Feedback Amount": {
+    "byte_offset": 94,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 97
+  },
+  "Feedback Tuning": {
+    "byte_offset": 95,
+    "last_new": 48,
+    "last_old": 0,
+    "max": 48,
+    "min": 0,
+    "nrpnA": 98
+  },
+  "Girth": {
+    "byte_offset": 77,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 81
+  },
+  "Glide": {
+    "byte_offset": 73,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 74
+  },
+  "Glide Mode": {
+    "byte_offset": 72,
+    "last_new": 3,
+    "last_old": 0,
+    "max": 3,
+    "min": 0,
+    "nrpnA": 73
+  },
+  "HPF Frequency": {
+    "byte_offset": 89,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 94
+  },
+  "HPF Key Amount": {
+    "byte_offset": 91,
+    "last_new": 127,
+    "last_old": 65,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 96
+  },
+  "HPF Resonance": {
+    "byte_offset": 90,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 95
+  },
+  "Hack": {
+    "byte_offset": 78,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 82
+  },
+  "LFO 1 Amount": {
+    "byte_offset": 140,
+    "last_new": 127,
+    "last_old": 3,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 151
+  },
+  "LFO 1 Destination": {
+    "byte_offset": 144,
+    "last_new": 98,
+    "last_old": 1,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 155
+  },
+  "LFO 1 Frequency": {
+    "byte_offset": 128,
+    "last_new": 255,
+    "last_old": 0,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 147
+  },
+  "LFO 1 Phase": {
+    "byte_offset": 160,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 153
+  },
+  "LFO 1 Shape": {
+    "byte_offset": 136,
+    "last_new": 7,
+    "last_old": 0,
+    "max": 7,
+    "min": 0,
+    "nrpnA": 150
+  },
+  "LFO 1 Slew Rate": {
+    "byte_offset": 156,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 152
+  },
+  "LFO 1 Sync": {
+    "byte_offset": 148,
+    "last_new": 0,
+    "last_old": 1,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 149
+  },
+  "LFO 1 Sync Setting": {
+    "byte_offset": 132,
+    "last_new": 15,
+    "last_old": 0,
+    "max": 15,
+    "min": 0,
+    "nrpnA": 148
+  },
+  "LFO 1 Wave Reset": {
+    "byte_offset": 152,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 154
+  },
+  "LFO 2 Amount": {
+    "byte_offset": 141,
+    "last_new": 127,
+    "last_old": 31,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 161
+  },
+  "LFO 2 Destination": {
+    "byte_offset": 145,
+    "last_new": 98,
+    "last_old": 36,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 165
+  },
+  "LFO 2 Frequency": {
+    "byte_offset": 129,
+    "last_new": 255,
+    "last_old": 134,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 157
+  },
+  "LFO 2 Phase": {
+    "byte_offset": 161,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 163
+  },
+  "LFO 2 Shape": {
+    "byte_offset": 137,
+    "last_new": 7,
+    "last_old": 0,
+    "max": 7,
+    "min": 0,
+    "nrpnA": 160
+  },
+  "LFO 2 Slew Rate": {
+    "byte_offset": 157,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 162
+  },
+  "LFO 2 Sync": {
+    "byte_offset": 149,
+    "last_new": 0,
+    "last_old": 1,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 159
+  },
+  "LFO 2 Sync Setting": {
+    "byte_offset": 133,
+    "last_new": 15,
+    "last_old": 0,
+    "max": 15,
+    "min": 0,
+    "nrpnA": 158
+  },
+  "LFO 2 Wave Reset": {
+    "byte_offset": 153,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 164
+  },
+  "LFO 3 Amount": {
+    "byte_offset": 142,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 171
+  },
+  "LFO 3 Destination": {
+    "byte_offset": 146,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 175
+  },
+  "LFO 3 Frequency": {
+    "byte_offset": 130,
+    "last_new": 255,
+    "last_old": 134,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 167
+  },
+  "LFO 3 Phase": {
+    "byte_offset": 162,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 173
+  },
+  "LFO 3 Shape": {
+    "byte_offset": 138,
+    "last_new": 7,
+    "last_old": 0,
+    "max": 7,
+    "min": 0,
+    "nrpnA": 170
+  },
+  "LFO 3 Slew Rate": {
+    "byte_offset": 158,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 172
+  },
+  "LFO 3 Sync": {
+    "byte_offset": 150,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 169
+  },
+  "LFO 3 Sync Setting": {
+    "byte_offset": 134,
+    "last_new": 15,
+    "last_old": 0,
+    "max": 15,
+    "min": 0,
+    "nrpnA": 168
+  },
+  "LFO 3 Wave Reset": {
+    "byte_offset": 154,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 174
+  },
+  "LFO 4 Amount": {
+    "byte_offset": 143,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 181
+  },
+  "LFO 4 Destination": {
+    "byte_offset": 147,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 185
+  },
+  "LFO 4 Frequency": {
+    "byte_offset": 131,
+    "last_new": 255,
+    "last_old": 134,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 177
+  },
+  "LFO 4 Phase": {
+    "byte_offset": 163,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 183
+  },
+  "LFO 4 Shape": {
+    "byte_offset": 139,
+    "last_new": 7,
+    "last_old": 0,
+    "max": 7,
+    "min": 0,
+    "nrpnA": 180
+  },
+  "LFO 4 Slew Rate": {
+    "byte_offset": 159,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 182
+  },
+  "LFO 4 Sync": {
+    "byte_offset": 151,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 179
+  },
+  "LFO 4 Sync Setting": {
+    "byte_offset": 135,
+    "last_new": 15,
+    "last_old": 0,
+    "max": 15,
+    "min": 0,
+    "nrpnA": 178
+  },
+  "LFO 4 Wave Reset": {
+    "byte_offset": 155,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 184
+  },
+  "LPF 2/4 Pole": {
+    "byte_offset": 88,
+    "last_new": 0,
+    "last_old": 1,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 93
+  },
+  "LPF Env Attack": {
+    "byte_offset": 180,
+    "last_new": 127,
+    "last_old": 7,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 117
+  },
+  "LPF Env Decay": {
+    "byte_offset": 184,
+    "last_new": 127,
+    "last_old": 78,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 118
+  },
+  "LPF Env Delay": {
+    "byte_offset": 176,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 116
+  },
+  "LPF Env Release": {
+    "byte_offset": 192,
+    "last_new": 127,
+    "last_old": 19,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 120
+  },
+  "LPF Env Repeat": {
+    "byte_offset": 198,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 121
+  },
+  "LPF Env Sustain": {
+    "byte_offset": 188,
+    "last_new": 127,
+    "last_old": 89,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 119
+  },
+  "LPF Envelope Amt": {
+    "byte_offset": 168,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 114
+  },
+  "LPF Frequency": {
+    "byte_offset": 85,
+    "last_new": 164,
+    "last_old": 9,
+    "max": 164,
+    "min": 0,
+    "nrpnA": 90
+  },
+  "LPF Key Amount": {
+    "byte_offset": 87,
+    "last_new": 127,
+    "last_old": 22,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 92
+  },
+  "LPF Resonance": {
+    "byte_offset": 86,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 91
+  },
+  "Mod 1 Amount": {
+    "byte_offset": 222,
+    "last_new": 254,
+    "last_old": 150,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 220
+  },
+  "Mod 1 Destination": {
+    "byte_offset": 238,
+    "last_new": 98,
+    "last_old": 66,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 221
+  },
+  "Mod 1 Source": {
+    "byte_offset": 206,
+    "last_new": 27,
+    "last_old": 14,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 219
+  },
+  "Mod 10 Amount": {
+    "byte_offset": 231,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 256
+  },
+  "Mod 10 Destination": {
+    "byte_offset": 247,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 257
+  },
+  "Mod 10 Source": {
+    "byte_offset": 215,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 255
+  },
+  "Mod 11 Amount": {
+    "byte_offset": 232,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 260
+  },
+  "Mod 11 Destination": {
+    "byte_offset": 248,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 261
+  },
+  "Mod 11 Source": {
+    "byte_offset": 216,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 259
+  },
+  "Mod 12 Amount": {
+    "byte_offset": 233,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 264
+  },
+  "Mod 12 Destination": {
+    "byte_offset": 249,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 265
+  },
+  "Mod 12 Source": {
+    "byte_offset": 217,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 263
+  },
+  "Mod 13 Amount": {
+    "byte_offset": 234,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 268
+  },
+  "Mod 13 Destination": {
+    "byte_offset": 250,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 269
+  },
+  "Mod 13 Source": {
+    "byte_offset": 218,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 267
+  },
+  "Mod 14 Amount": {
+    "byte_offset": 235,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 272
+  },
+  "Mod 14 Destination": {
+    "byte_offset": 251,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 273
+  },
+  "Mod 14 Source": {
+    "byte_offset": 219,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 271
+  },
+  "Mod 15 Amount": {
+    "byte_offset": 236,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 276
+  },
+  "Mod 15 Destination": {
+    "byte_offset": 252,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 277
+  },
+  "Mod 15 Source": {
+    "byte_offset": 220,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 275
+  },
+  "Mod 16 Amount": {
+    "byte_offset": 237,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 280
+  },
+  "Mod 16 Destination": {
+    "byte_offset": 253,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 281
+  },
+  "Mod 16 Source": {
+    "byte_offset": 221,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 279
+  },
+  "Mod 2 Amount": {
+    "byte_offset": 223,
+    "last_new": 254,
+    "last_old": 240,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 224
+  },
+  "Mod 2 Destination": {
+    "byte_offset": 239,
+    "last_new": 98,
+    "last_old": 36,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 225
+  },
+  "Mod 2 Source": {
+    "byte_offset": 207,
+    "last_new": 27,
+    "last_old": 15,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 223
+  },
+  "Mod 3 Amount": {
+    "byte_offset": 224,
+    "last_new": 254,
+    "last_old": 160,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 228
+  },
+  "Mod 3 Destination": {
+    "byte_offset": 240,
+    "last_new": 98,
+    "last_old": 38,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 229
+  },
+  "Mod 3 Source": {
+    "byte_offset": 208,
+    "last_new": 27,
+    "last_old": 16,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 227
+  },
+  "Mod 4 Amount": {
+    "byte_offset": 225,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 232
+  },
+  "Mod 4 Destination": {
+    "byte_offset": 241,
+    "last_new": 98,
+    "last_old": 35,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 233
+  },
+  "Mod 4 Source": {
+    "byte_offset": 209,
+    "last_new": 27,
+    "last_old": 19,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 231
+  },
+  "Mod 5 Amount": {
+    "byte_offset": 226,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 236
+  },
+  "Mod 5 Destination": {
+    "byte_offset": 242,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 237
+  },
+  "Mod 5 Source": {
+    "byte_offset": 210,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 235
+  },
+  "Mod 6 Amount": {
+    "byte_offset": 227,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 240
+  },
+  "Mod 6 Destination": {
+    "byte_offset": 243,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 241
+  },
+  "Mod 6 Source": {
+    "byte_offset": 211,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 239
+  },
+  "Mod 7 Amount": {
+    "byte_offset": 228,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 244
+  },
+  "Mod 7 Destination": {
+    "byte_offset": 244,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 245
+  },
+  "Mod 7 Source": {
+    "byte_offset": 212,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 243
+  },
+  "Mod 8 Amount": {
+    "byte_offset": 229,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 248
+  },
+  "Mod 8 Destination": {
+    "byte_offset": 245,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 249
+  },
+  "Mod 8 Source": {
+    "byte_offset": 213,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 247
+  },
+  "Mod 9 Amount": {
+    "byte_offset": 230,
+    "last_new": 254,
+    "last_old": 127,
+    "max": 254,
+    "min": 0,
+    "nrpnA": 252
+  },
+  "Mod 9 Destination": {
+    "byte_offset": 246,
+    "last_new": 98,
+    "last_old": 0,
+    "max": 98,
+    "min": 0,
+    "nrpnA": 253
+  },
+  "Mod 9 Source": {
+    "byte_offset": 214,
+    "last_new": 27,
+    "last_old": 0,
+    "max": 27,
+    "min": 0,
+    "nrpnA": 251
+  },
+  "Osc 1 AM": {
+    "byte_offset": 36,
+    "last_new": 0,
+    "last_old": 255,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 8
+  },
+  "Osc 1 FM": {
+    "byte_offset": 32,
+    "last_new": 255,
+    "last_old": 0,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 7
+  },
+  "Osc 1 Fine Tune": {
+    "byte_offset": 4,
+    "last_new": 100,
+    "last_old": 0,
+    "max": 100,
+    "min": 0,
+    "nrpnA": 1
+  },
+  "Osc 1 Glide Amount": {
+    "byte_offset": 48,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 10
+  },
+  "Osc 1 Key Follow": {
+    "byte_offset": 56,
+    "last_new": 0,
+    "last_old": 1,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 12
+  },
+  "Osc 1 Level": {
+    "byte_offset": 8,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 2
+  },
+  "Osc 1 Pitch": {
+    "byte_offset": 0,
+    "last_new": 0,
+    "last_old": 120,
+    "max": 120,
+    "min": 0,
+    "nrpnA": 0
+  },
+  "Osc 1 Shape": {
+    "byte_offset": 12,
+    "last_new": 19,
+    "last_old": 0,
+    "max": 19,
+    "min": 0,
+    "nrpnA": 3
+  },
+  "Osc 1 Shape Mod": {
     "byte_offset": 28,
     "last_new": 0,
-    "last_old": 127
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 4
   },
-  "pitch_high": {
-    "byte_offset": 0,
+  "Osc 1 Slop": {
+    "byte_offset": 44,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 9
+  },
+  "Osc 1 Sub Octave": {
+    "byte_offset": 40,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 72
+  },
+  "Osc 1 Sync": {
+    "byte_offset": 52,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 11
+  },
+  "Osc 1 Wave Left": {
+    "byte_offset": 16,
+    "last_new": 11,
+    "last_old": 0,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 5
+  },
+  "Osc 1 Wave Reset": {
+    "byte_offset": 60,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 13
+  },
+  "Osc 1 Wave Right": {
+    "byte_offset": 24,
+    "last_new": 11,
+    "last_old": 4,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 6
+  },
+  "Osc 2 AM": {
+    "byte_offset": 37,
+    "last_new": 255,
+    "last_old": 132,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 26
+  },
+  "Osc 2 FM": {
+    "byte_offset": 33,
+    "last_new": 255,
+    "last_old": 66,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 25
+  },
+  "Osc 2 Fine Tune": {
+    "byte_offset": 5,
+    "last_new": 100,
+    "last_old": 50,
+    "max": 100,
+    "min": 0,
+    "nrpnA": 19
+  },
+  "Osc 2 Glide Amount": {
+    "byte_offset": 49,
+    "last_new": 127,
+    "last_old": 70,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 28
+  },
+  "Osc 2 Key Follow": {
+    "byte_offset": 57,
+    "last_new": 0,
+    "last_old": 1,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 30
+  },
+  "Osc 2 Level": {
+    "byte_offset": 9,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 20
+  },
+  "Osc 2 Pitch": {
+    "byte_offset": 1,
     "last_new": 120,
-    "last_old": 0
+    "last_old": 24,
+    "max": 120,
+    "min": 0,
+    "nrpnA": 18
+  },
+  "Osc 2 Shape": {
+    "byte_offset": 13,
+    "last_new": 19,
+    "last_old": 1,
+    "max": 19,
+    "min": 0,
+    "nrpnA": 21
+  },
+  "Osc 2 Shape Mod": {
+    "byte_offset": 29,
+    "last_new": 127,
+    "last_old": 64,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 22
+  },
+  "Osc 2 Slop": {
+    "byte_offset": 45,
+    "last_new": 127,
+    "last_old": 125,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 27
+  },
+  "Osc 2 Sync": {
+    "byte_offset": 53,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 29
+  },
+  "Osc 2 Wave Left": {
+    "byte_offset": 17,
+    "last_new": 11,
+    "last_old": 1,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 23
+  },
+  "Osc 2 Wave Reset": {
+    "byte_offset": 61,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 31
+  },
+  "Osc 2 Wave Right": {
+    "byte_offset": 25,
+    "last_new": 11,
+    "last_old": 5,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 24
+  },
+  "Osc 3 AM": {
+    "byte_offset": 38,
+    "last_new": 255,
+    "last_old": 132,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 44
+  },
+  "Osc 3 FM": {
+    "byte_offset": 34,
+    "last_new": 255,
+    "last_old": 66,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 43
+  },
+  "Osc 3 Fine Tune": {
+    "byte_offset": 6,
+    "last_new": 100,
+    "last_old": 50,
+    "max": 100,
+    "min": 0,
+    "nrpnA": 37
+  },
+  "Osc 3 Glide Amount": {
+    "byte_offset": 50,
+    "last_new": 127,
+    "last_old": 70,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 46
+  },
+  "Osc 3 Key Follow": {
+    "byte_offset": 58,
+    "last_new": 0,
+    "last_old": 1,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 48
+  },
+  "Osc 3 Level": {
+    "byte_offset": 10,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 38
+  },
+  "Osc 3 Pitch": {
+    "byte_offset": 2,
+    "last_new": 120,
+    "last_old": 24,
+    "max": 120,
+    "min": 0,
+    "nrpnA": 36
+  },
+  "Osc 3 Shape": {
+    "byte_offset": 14,
+    "last_new": 19,
+    "last_old": 1,
+    "max": 19,
+    "min": 0,
+    "nrpnA": 39
+  },
+  "Osc 3 Shape Mod": {
+    "byte_offset": 30,
+    "last_new": 127,
+    "last_old": 64,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 40
+  },
+  "Osc 3 Slop": {
+    "byte_offset": 46,
+    "last_new": 127,
+    "last_old": 125,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 45
+  },
+  "Osc 3 Sync": {
+    "byte_offset": 54,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 47
+  },
+  "Osc 3 Wave Left": {
+    "byte_offset": 18,
+    "last_new": 11,
+    "last_old": 2,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 41
+  },
+  "Osc 3 Wave Reset": {
+    "byte_offset": 62,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 49
+  },
+  "Osc 3 Wave Right": {
+    "byte_offset": 26,
+    "last_new": 11,
+    "last_old": 6,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 42
+  },
+  "Osc 4 AM": {
+    "byte_offset": 39,
+    "last_new": 255,
+    "last_old": 132,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 62
+  },
+  "Osc 4 FM": {
+    "byte_offset": 35,
+    "last_new": 255,
+    "last_old": 66,
+    "max": 255,
+    "min": 0,
+    "nrpnA": 61
+  },
+  "Osc 4 Fine Tune": {
+    "byte_offset": 7,
+    "last_new": 100,
+    "last_old": 50,
+    "max": 100,
+    "min": 0,
+    "nrpnA": 55
+  },
+  "Osc 4 Glide Amount": {
+    "byte_offset": 51,
+    "last_new": 127,
+    "last_old": 70,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 64
+  },
+  "Osc 4 Key Follow": {
+    "byte_offset": 59,
+    "last_new": 0,
+    "last_old": 1,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 66
+  },
+  "Osc 4 Level": {
+    "byte_offset": 11,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 56
+  },
+  "Osc 4 Pitch": {
+    "byte_offset": 3,
+    "last_new": 120,
+    "last_old": 0,
+    "max": 120,
+    "min": 0,
+    "nrpnA": 54
+  },
+  "Osc 4 Shape": {
+    "byte_offset": 15,
+    "last_new": 19,
+    "last_old": 1,
+    "max": 19,
+    "min": 0,
+    "nrpnA": 57
+  },
+  "Osc 4 Shape Mod": {
+    "byte_offset": 31,
+    "last_new": 127,
+    "last_old": 66,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 58
+  },
+  "Osc 4 Slop": {
+    "byte_offset": 47,
+    "last_new": 127,
+    "last_old": 125,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 63
+  },
+  "Osc 4 Sync": {
+    "byte_offset": 55,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 65
+  },
+  "Osc 4 Wave Left": {
+    "byte_offset": 19,
+    "last_new": 11,
+    "last_old": 3,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 59
+  },
+  "Osc 4 Wave Reset": {
+    "byte_offset": 63,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 67
+  },
+  "Osc 4 Wave Right": {
+    "byte_offset": 27,
+    "last_new": 11,
+    "last_old": 7,
+    "max": 11,
+    "min": 0,
+    "nrpnA": 60
+  },
+  "Pan Spread": {
+    "byte_offset": 92,
+    "last_new": 127,
+    "last_old": 107,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 100
+  },
+  "Pitchbend Range Down": {
+    "byte_offset": 75,
+    "last_new": 24,
+    "last_old": 7,
+    "max": 24,
+    "min": 0,
+    "nrpnA": 76
+  },
+  "Pitchbend Range Up": {
+    "byte_offset": 74,
+    "last_new": 12,
+    "last_old": 7,
+    "max": 12,
+    "min": 0,
+    "nrpnA": 75
+  },
+  "Split Point": {
+    "byte_offset": 424,
+    "byte_offset_mirror": 936,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 287
+  },
+  "Unison": {
+    "byte_offset": 257,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 283
+  },
+  "Unison Detune": {
+    "byte_offset": 258,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 284
+  },
+  "Unison Key Assign": {
+    "byte_offset": 260,
+    "last_new": 5,
+    "last_old": 1,
+    "max": 5,
+    "min": 0,
+    "nrpnA": 286
+  },
+  "Unison Mode": {
+    "byte_offset": 259,
+    "last_new": 1,
+    "last_old": 11,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 285
+  },
+  "VCA Env Attack": {
+    "byte_offset": 181,
+    "last_new": 127,
+    "last_old": 11,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 106
+  },
+  "VCA Env Decay": {
+    "byte_offset": 185,
+    "last_new": 127,
+    "last_old": 94,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 107
+  },
+  "VCA Env Delay": {
+    "byte_offset": 177,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 105
+  },
+  "VCA Env Release": {
+    "byte_offset": 193,
+    "last_new": 127,
+    "last_old": 104,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 109
+  },
+  "VCA Env Repeat": {
+    "byte_offset": 199,
+    "last_new": 1,
+    "last_old": 0,
+    "max": 1,
+    "min": 0,
+    "nrpnA": 110
+  },
+  "VCA Env Sustain": {
+    "byte_offset": 189,
+    "last_new": 127,
+    "last_old": 85,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 108
+  },
+  "VCA Envelope Amt": {
+    "byte_offset": 169,
+    "last_new": 127,
+    "last_old": 108,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 103
+  },
+  "Velocity to Env 3 Amt": {
+    "byte_offset": 174,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 126
+  },
+  "Velocity to Env 4 Amt": {
+    "byte_offset": 175,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 137
+  },
+  "Velocity to LPF Env Amt": {
+    "byte_offset": 172,
+    "last_new": 127,
+    "last_old": 0,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 115
+  },
+  "Velocity to VCA Env Amt": {
+    "byte_offset": 173,
+    "last_new": 127,
+    "last_old": 106,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 104
+  },
+  "Voice Volume": {
+    "byte_offset": 93,
+    "last_new": 0,
+    "last_old": 127,
+    "max": 127,
+    "min": 0,
+    "nrpnA": 99
   }
 }

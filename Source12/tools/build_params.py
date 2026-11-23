@@ -155,6 +155,32 @@ for p in params:
     p['min'] = 0
     p['max'] = len(options) - 1
 
+# The manual's printed NRPN numbers for "Delay N Pan" (427-430) are off by
+# two -- confirmed empirically against real hardware (SysEx dump byte-diff
+# testing, see Source12/tools/auto_map_bytes.py): NRPN 427/428 produce no
+# response at all, while 429/430/431/432 do, landing at the expected
+# interleaved-by-channel byte offsets that match every other Delay N field
+# (e.g. Delay Time sits at bytes 96/97/98/99 for channels 1-4; Pan sits at
+# 164/165/166/167 for NRPN 429/430/431/432, i.e. channel N -> NRPN 428+N).
+for p in params:
+    m = re.match(r'^Delay (\d) Pan$', p['name'])
+    if not m:
+        continue
+    chan = int(m.group(1))
+    p['nrpnA'] = 428 + chan
+    if p['nrpnB'] is not None:
+        p['nrpnB'] = 940 + chan
+
+# BPM's printed NRPN (288) collides with A/B Mode's (also printed as 288) --
+# confirmed empirically that 288 really is A/B Mode (changes the expected
+# split/stack byte); BPM's true number is unknown (a brute-force scan of
+# the unclaimed 296-300 gap right after it in the manual's Arp section
+# didn't turn up a convincing match either). Shipping BPM at the wrong,
+# colliding number would make its knob silently corrupt A/B Mode instead,
+# which is worse than not having a BPM control at all -- drop it until the
+# real number is found.
+params = [p for p in params if p['name'] != 'BPM']
+
 print('total GUI params:', len(params))
 from collections import Counter
 print(Counter(p['section'] for p in params))
