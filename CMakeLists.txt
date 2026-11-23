@@ -248,6 +248,7 @@ set(SEER12_PLUGIN_SOURCES
     Source12/ParamControl.cpp
     Source12/MultiInstanceParamControl.cpp
     Source12/CategorizedCombo.cpp
+    Source12/SysexCapturePanel.cpp
     Source12/LookAndFeelP12.cpp
     Source12/MidiMonitorPanel.cpp)
 

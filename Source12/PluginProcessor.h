@@ -3,6 +3,7 @@
 #include "Parameters.h"
 #include "NrpnDecoder.h"
 #include "MidiActivityLog.h"
+#include "SysexCapture.h"
 #include <unordered_map>
 
 // Seer12 is an INSTRUMENT: load it on an FL Studio instrument track, play/
@@ -58,6 +59,13 @@ public:
     // to channel 1 (Global > 1. MIDI Channel) unless changed.
     std::atomic<int> midiChannel { 1 };
 
+    // Byte-layout reverse-engineering tool (see Source12/CONTEXT.md, "SysEx
+    // dump capture"): call this from the UI to ask the hardware for a full
+    // Program Edit Buffer Dump; the result shows up in sysexLog once it
+    // arrives (polled from the editor's Timer, same pattern as midiLog).
+    void requestEditBufferDump();
+    p12::SysexCaptureLog sysexLog;
+
 private:
     void parameterChanged(const juce::String& parameterID, float newValue) override;
     void sendNrpnOut(juce::MidiBuffer& out, int paramIndex, int rawValue, int samplePosition);
@@ -76,6 +84,11 @@ private:
     // that fires on), drained once per audio block in processBlock.
     std::array<std::atomic<int>, p12::kNumParams> pendingOutRaw;
     std::array<std::atomic<bool>, p12::kNumParams> pendingFlag;
+
+    // Set by requestEditBufferDump() (called from the message thread, e.g. a
+    // button click) and drained once per audio block in processBlock, which
+    // actually queues the outgoing sysex request.
+    std::atomic<bool> pendingDumpRequest { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Seer12Processor)
 };

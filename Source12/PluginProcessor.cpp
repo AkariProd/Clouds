@@ -76,6 +76,11 @@ void Seer12Processor::sendNrpnOut(juce::MidiBuffer& out, int paramIndex, int raw
     midiLog.incrementSentOut();
 }
 
+void Seer12Processor::requestEditBufferDump()
+{
+    pendingDumpRequest.store(true, std::memory_order_release);
+}
+
 void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -118,6 +123,16 @@ void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
             // the four NRPN plumbing CCs (99/98/6/38) are hardware->plugin
             // only; don't forward them on to MIDI out.
         }
+        else if (msg.isSysEx())
+        {
+            std::vector<uint8_t> unpacked;
+            bool isEditBuffer = false;
+            int bank = -1, program = -1;
+            if (p12::tryParseProphetDump(msg, unpacked, isEditBuffer, bank, program))
+                sysexLog.publish(std::move(unpacked), isEditBuffer, bank, program);
+            else
+                outgoing.addEvent(msg, metadata.samplePosition);  // some other sysex -- pass through
+        }
         else
         {
             // notes, pitch bend, (poly/channel) pressure, program change --
@@ -134,6 +149,9 @@ void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
         if (pendingFlag[(size_t) i].exchange(false, std::memory_order_acquire))
             sendNrpnOut(outgoing, i, pendingOutRaw[(size_t) i].load(std::memory_order_relaxed), 0);
     }
+
+    if (pendingDumpRequest.exchange(false, std::memory_order_acquire))
+        outgoing.addEvent(p12::buildRequestEditBufferDump(), 0);
 
     midi.swapWith(outgoing);
 }

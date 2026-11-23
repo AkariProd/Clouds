@@ -81,7 +81,7 @@ void Seer12PanelContent::resized()
 }
 
 Seer12Editor::Seer12Editor(Seer12Processor& p)
-    : AudioProcessorEditor(&p), processor(p), content(p.apvts), midiMonitor(p)
+    : AudioProcessorEditor(&p), processor(p), content(p.apvts), midiMonitor(p), sysexCapture(p)
 {
     setLookAndFeel(&lookAndFeel);
 
@@ -92,13 +92,14 @@ Seer12Editor::Seer12Editor(Seer12Processor& p)
     addAndMakeVisible(titleLabel);
 
     addAndMakeVisible(midiMonitor);
+    addAndMakeVisible(sysexCapture);
 
     viewport.setViewedComponent(&content, false);
     viewport.setScrollBarsShown(true, false);
     addAndMakeVisible(viewport);
 
     setResizable(true, true);
-    setSize(1200, 900);
+    setSize(1200, 950);
 }
 
 Seer12Editor::~Seer12Editor()
@@ -116,5 +117,6 @@ void Seer12Editor::resized()
     auto b = getLocalBounds();
     titleLabel.setBounds(b.removeFromTop(32).reduced(10, 4));
     midiMonitor.setBounds(b.removeFromTop(92).reduced(8, 2));
+    sysexCapture.setBounds(b.removeFromTop(64).reduced(8, 2));
     viewport.setBounds(b);
 }
