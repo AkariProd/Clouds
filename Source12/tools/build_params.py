@@ -17,6 +17,21 @@ DELAY_SYNC_SETTING_OPTIONS = [
     "Quarter", "Dotted Quarter", "Half", "Dotted Half", "Whole",
 ]
 
+# "LFO N Shape" was auto-extracted as a 5-option enum (triangle, reverse
+# sawtooth, sawtooth, square, random) because that's literally all the
+# inline text the manual prints for the row -- but the real NRPN range is
+# 0-7, and the manual's own front-panel description confirms three extra
+# "Pulse" shapes sit between Square and Random. Hardware-confirmed: LFO 1
+# was shipping as a 5-choice AudioParameterChoice, so NRPN value 4 ("random"
+# in the old 5-option list) actually produced Pulse 1 on the hardware, and
+# Pulse 2/3 were simply unreachable from the UI. LFO 2-4 Shape were left as
+# plain 0-7 int knobs (no enum) and were NOT affected by this bug -- this
+# override brings all four in line with a proper named 8-option dropdown.
+LFO_SHAPE_OPTIONS = [
+    "triangle", "reverse sawtooth", "sawtooth", "square",
+    "pulse 1", "pulse 2", "pulse 3", "random",
+]
+
 entries = json.load(open('entries_final.json'))
 
 SECTION_RULES = [
@@ -154,6 +169,18 @@ for p in params:
     p['categories'] = None
     p['min'] = 0
     p['max'] = len(options) - 1
+
+# See comment above LFO_SHAPE_OPTIONS -- applies to all four LFOs, whether
+# the auto-extraction originally classified the row as an enum (LFO 1, which
+# had the bug) or a plain int knob (LFO 2-4, which didn't, but get the same
+# proper dropdown for UI consistency).
+for p in params:
+    if re.match(r'^LFO \d+ Shape$', p['name']):
+        p['type'] = 'enum'
+        p['options'] = LFO_SHAPE_OPTIONS
+        p['categories'] = None
+        p['min'] = 0
+        p['max'] = len(LFO_SHAPE_OPTIONS) - 1
 
 # The manual's printed NRPN numbers for "Delay N Pan" (427-430) are off by
 # two -- confirmed empirically against real hardware (SysEx dump byte-diff

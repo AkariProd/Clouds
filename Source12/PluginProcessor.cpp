@@ -100,6 +100,27 @@ void Seer12Processor::changeProgram(int delta)
     juce::Timer::callAfterDelay(120, [this] { directLink.sendDumpRequest(); });
 }
 
+void Seer12Processor::forceSendAllParams()
+{
+    for (int i = 0; i < p12::kNumParams; ++i)
+    {
+        const auto& def = p12::kParams[i];
+        auto* param = apvts.getParameter(def.id);
+        if (param == nullptr)
+            continue;
+
+        int raw;
+        if (def.type == p12::ParamType::Toggle)
+            raw = param->getValue() > 0.5f ? 1 : 0;
+        else
+            raw = (int) std::lround(param->convertFrom0to1(param->getValue()));
+        raw = juce::jlimit(def.minValue, def.maxValue, raw);
+
+        pendingOutRaw[(size_t) i].store(raw, std::memory_order_relaxed);
+        pendingFlag[(size_t) i].store(true, std::memory_order_release);
+    }
+}
+
 void Seer12Processor::applyFullDump(const std::vector<uint8_t>& dump)
 {
     int applied = 0;
@@ -234,12 +255,24 @@ void Seer12Processor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
         }
     }
 
-    // Flush any GUI/automation knob moves made since the last block as
-    // outgoing NRPN, so the hardware mirrors what's shown on screen too.
-    for (int i = 0; i < p12::kNumParams; ++i)
+    // Flush any GUI/automation/hardware-preset-load knob moves made since
+    // the last block as outgoing NRPN, so the hardware mirrors what's shown
+    // on screen too. Paced to a small budget per block: a single live knob
+    // touch still goes out immediately (found within a few scan steps
+    // either way), but a full preset load -- which queues all 245 at once
+    // via forceSendAllParams() -- spreads itself over many blocks instead
+    // of trying to blast ~1000 CC bytes down the wire in one shot, which
+    // some MIDI interfaces/hardware input buffers can't keep up with.
+    static constexpr int kMaxParamSendsPerBlock = 2;
+    int sentThisBlock = 0;
+    for (int step = 0; step < p12::kNumParams && sentThisBlock < kMaxParamSendsPerBlock; ++step)
     {
+        const int i = paramDrainCursor.fetch_add(1, std::memory_order_relaxed) % p12::kNumParams;
         if (pendingFlag[(size_t) i].exchange(false, std::memory_order_acquire))
+        {
             sendNrpnOut(outgoing, i, pendingOutRaw[(size_t) i].load(std::memory_order_relaxed), 0);
+            ++sentThisBlock;
+        }
     }
 
     if (pendingDumpRequest.exchange(false, std::memory_order_acquire))
@@ -274,7 +307,14 @@ void Seer12Processor::setStateInformation(const void* data, int sizeInBytes)
 {
     auto tree = juce::ValueTree::readFromData(data, static_cast<size_t>(sizeInBytes));
     if (tree.isValid())
+    {
         apvts.replaceState(tree);
+        // Push every param out to the hardware (paced, see processBlock),
+        // not just the ones that happened to differ from whatever patch was
+        // loaded on the Prophet 12 before -- otherwise a saved Seer12
+        // preset only partially recalls on the real synth.
+        forceSendAllParams();
+    }
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

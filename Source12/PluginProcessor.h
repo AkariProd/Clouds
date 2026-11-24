@@ -81,6 +81,17 @@ public:
     void changeProgram(int delta);
     std::atomic<int> currentProgramGuess { 0 };  // 0-127, best-effort local tracking only
 
+    // Queues every one of the 245 params for outgoing NRPN, regardless of
+    // whether its value actually changed -- used after loading a saved
+    // Seer12 preset (DAW state recall, see setStateInformation) so the real
+    // Prophet 12 ends up matching exactly, not just the params that happen
+    // to differ from whatever was on the hardware before. Also reachable
+    // from the UI as a manual "Push to hardware" action. The actual sends
+    // are paced in processBlock (a few params per block, not all 245 at
+    // once) so a slower MIDI interface/hardware input buffer doesn't drop
+    // messages from one huge burst.
+    void forceSendAllParams();
+
     // Full-preset sync: every ParamDef with a known dumpByteOffset (see
     // Source12/tools/byte_offset_map.json, reverse-engineered against real
     // hardware) gets set from the dump's raw bytes whenever one arrives --
@@ -123,6 +134,12 @@ private:
     // Set by changeProgram() (message thread); drained in processBlock to
     // queue an outgoing Program Change. -1 means nothing pending.
     std::atomic<int> pendingProgramChange { -1 };
+
+    // Round-robin scan position for the paced NRPN drain in processBlock
+    // (see forceSendAllParams()) -- keeps a single live knob touch getting
+    // sent immediately (it's found within a few scan steps either way)
+    // while a 245-param forced push spreads itself over many blocks.
+    std::atomic<int> paramDrainCursor { 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Seer12Processor)
 };

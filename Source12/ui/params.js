@@ -1465,13 +1465,16 @@ window.SEER_PARAMS = [
   "name": "LFO 1 Shape",
   "section": "LFO1",
   "min": 0,
-  "max": 4,
+  "max": 7,
   "type": "enum",
   "options": [
    "triangle",
    "reverse sawtooth",
    "sawtooth",
    "square",
+   "pulse 1",
+   "pulse 2",
+   "pulse 3",
    "random"
   ]
  },
@@ -1773,7 +1776,17 @@ window.SEER_PARAMS = [
   "section": "LFO2",
   "min": 0,
   "max": 7,
-  "type": "knob"
+  "type": "enum",
+  "options": [
+   "triangle",
+   "reverse sawtooth",
+   "sawtooth",
+   "square",
+   "pulse 1",
+   "pulse 2",
+   "pulse 3",
+   "random"
+  ]
  },
  {
   "id": "lfo_2_amount",
@@ -2073,7 +2086,17 @@ window.SEER_PARAMS = [
   "section": "LFO3",
   "min": 0,
   "max": 7,
-  "type": "knob"
+  "type": "enum",
+  "options": [
+   "triangle",
+   "reverse sawtooth",
+   "sawtooth",
+   "square",
+   "pulse 1",
+   "pulse 2",
+   "pulse 3",
+   "random"
+  ]
  },
  {
   "id": "lfo_3_amount",
@@ -2373,7 +2396,17 @@ window.SEER_PARAMS = [
   "section": "LFO4",
   "min": 0,
   "max": 7,
-  "type": "knob"
+  "type": "enum",
+  "options": [
+   "triangle",
+   "reverse sawtooth",
+   "sawtooth",
+   "square",
+   "pulse 1",
+   "pulse 2",
+   "pulse 3",
+   "random"
+  ]
  },
  {
   "id": "lfo_4_amount",
