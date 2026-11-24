@@ -44,7 +44,7 @@
   // ---------- header ----------
   const app = document.getElementById("app");
   const hdr = el("div", "hdr");
-  const logo = el("div", "logo", `<div class="logo-mark"></div>SEER12`);
+  const logo = el("div", "logo", `<div class="logo-mark"></div>SEER<b>12</b>`);
   const tabs = el("div", "tabs");
   // Preset strip: shows the hardware's current patch; while you touch a
   // control it shows that parameter instead, then falls back to the patch.
@@ -127,7 +127,7 @@
       {
         const sh = V(o("shape")), wt = sh >= 5 && sh <= 16;
         waves.classList.toggle("inactive", !wt);
-        G.osc(w.svg, { shape: sh, mod: N(o("shape_mod")), level: N(o("level")), waveL: V(o("wave_left")), waveR: V(o("wave_right")), color: C("osc") });
+        G.osc(w.svg, { shape: sh, mod: N(o("shape_mod")), modRaw: V(o("shape_mod")), level: N(o("level")), waveL: V(o("wave_left")), waveR: V(o("wave_right")), color: C("trace") });
       });
 
     const k = el("div", "osc-ctrls");
@@ -170,7 +170,7 @@
     k.classList.add("spread"); k.style.flex = "1"; k.style.flexWrap = "nowrap";
     body.append(w, k); c.append(body);
     watch([ids.f, ids.r].concat(ids.pole ? [ids.pole] : []), () =>
-      G.filter(w.svg, { type, freq: N(ids.f), res: N(ids.r), poles: ids.pole ? (V(ids.pole) ? 4 : 2) : 2, color: C("flt") }));
+      G.filter(w.svg, { type, freq: N(ids.f), res: N(ids.r), poles: ids.pole ? (V(ids.pole) ? 4 : 2) : 2, color: C("trace") }));
     return c;
   }
   r2.append(
@@ -198,7 +198,7 @@
     if (e.dest) { const s = select(e.dest, null); s.style.flex = "1"; foot.append(el("div", "k-label", "DEST"), s); }
     b.append(w, k, foot);
     b.addEventListener("shown", () => draw());
-    const draw = () => G.env(w.svg, { d: N(id("delay")), a: N(id("attack")), dec: N(id("decay")), s: N(id("sustain")), r: N(id("release")), repeat: V(id("repeat")), color: C("mod") });
+    const draw = () => G.env(w.svg, { d: N(id("delay")), a: N(id("attack")), dec: N(id("decay")), s: N(id("sustain")), r: N(id("release")), repeat: V(id("repeat")), color: C("trace") });
     watch([id("delay"), id("attack"), id("decay"), id("sustain"), id("release"), id("repeat")], draw);
   });
   right.append(envT.card);
@@ -222,7 +222,7 @@
       const lbl = UI.fmt(id("shape"), V(id("shape"))).toLowerCase();
       const shapeIdx = ["triangle", "rev", "sawtooth", "square", "pulse 1", "pulse 2", "pulse 3", "random"].findIndex(k => lbl.startsWith(k));
       G.lfo(w.svg, { shape: shapeIdx < 0 ? V(id("shape")) : shapeIdx, rate: syncOn ? N(id("sync_setting")) : N(id("frequency")), amount: N(id("amount")),
-        slew: N(id("slew_rate")), phase: N(id("phase")), color: C("lfo") });
+        slew: N(id("slew_rate")), phase: N(id("phase")), color: C("trace") });
     };
     watch([id("shape"), id("frequency"), id("amount"), id("slew_rate"), id("phase"), id("sync"), id("sync_setting")], lfoDraw);
     b.addEventListener("shown", lfoDraw);
@@ -297,7 +297,7 @@
     watch([id("time"), id("amount"), id("feedback"), id("sync"), id("sync_setting")], () => {
       const syncOn = !!V(id("sync"));
       row1.children[0].style.opacity = syncOn ? 0.35 : 1;
-      G.delay(w.svg, { time: syncOn ? N(id("sync_setting")) : N(id("time")), amount: N(id("amount")), feedback: N(id("feedback")), color: C("fx") });
+      G.delay(w.svg, { time: syncOn ? N(id("sync_setting")) : N(id("time")), amount: N(id("amount")), feedback: N(id("feedback")), color: C("trace") });
     });
     fx.append(c);
   }
@@ -322,7 +322,7 @@
   fr2.style.alignItems = "center";
   arpC.append(aw, fr1, fr2);
   watch(["arpeggiator", "arpeggiator_mode", "arpeggiator_range", "arpeggiator_repeats"], () =>
-    G.arp(aw.svg, { on: V("arpeggiator"), mode: V("arpeggiator_mode"), range: V("arpeggiator_range"), repeats: V("arpeggiator_repeats"), color: C("arp") }));
+    G.arp(aw.svg, { on: V("arpeggiator"), mode: V("arpeggiator_mode"), range: V("arpeggiator_range"), repeats: V("arpeggiator_repeats"), color: C("trace") }));
   ap.append(arpC);
 
   const glob = card("GLOBAL · LAYERS", "osc");

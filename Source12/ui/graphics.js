@@ -52,17 +52,40 @@
     }
   }
 
-  function wavetableHarmonics(idx, mod) {
-    const r = rng(idx * 17 + 3), h = [];
-    const bright = 0.35 + mod * 0.65;
-    for (let k = 0; k < 10; k++) h.push((r() * 2 - 1) * Math.pow(bright, k) * (k === 0 ? 1.4 : 1));
-    return h;
+  // The 12 P12 wavetables. Sequential never published the wave data, so each
+  // one is an additive recipe built to match its name / character:
+  // [amplitude, phase] per harmonic, starting at the fundamental.
+  const WAVETABLES = [
+    /* 0 Tines   */ [[1, 0], [0.15, 0], [0, 0], [0.05, 0], [0, 0], [0, 0], [0.32, 0.5], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0.22, 1.2]],
+    /* 1 Mellow  */ [[1, 0], [0.22, 1.6], [0.1, 0], [0.04, 1.6]],
+    /* 2 Church  */ [[0.8, 0], [1, 0], [0.55, 0], [0.7, 0], [0, 0], [0.35, 0], [0, 0], [0.5, 0]],
+    /* 3 Muted   */ [[1, 0], [0, 0], [0.42, 3.14], [0, 0], [0.12, 0], [0, 0], [0.04, 3.14]],
+    /* 4 Nasal   */ [[0.35, 0], [0.5, 0.4], [0.85, 0.9], [1, 1.3], [0.75, 1.9], [0.4, 2.4], [0.2, 2.9]],
+    /* 5 Boing   */ [[1, 0], [0.9, 1.57], [0.45, 0.2], [0.2, 2.6], [0.15, 0.8]],
+    /* 6 Gothic  */ [[1, 0], [0, 0], [-0.55, 0], [0, 0], [0.42, 0], [0, 0], [-0.33, 0], [0, 0], [0.26, 0], [0, 0], [-0.2, 0]],
+    /* 7 Ahhh    */ [[0.45, 0], [0.4, 0], [0.35, 0], [0.5, 0], [0.75, 0], [0.95, 0], [0.8, 0], [0.45, 0], [0.25, 0], [0.3, 0], [0.4, 0], [0.2, 0]],
+    /* 8 Shrill  */ [[0.35, 0], [0.1, 0], [0.05, 0], [0, 0], [0, 0], [0.1, 0], [0.25, 0], [0.5, 0], [0.8, 0], [1, 0], [0.85, 0], [0.55, 0], [0.3, 0]],
+    /* 9 Ohhhh   */ [[1, 0], [0.85, 0], [0.55, 0], [0.18, 0], [0.06, 0]],
+    /* 10 Buzzzz */ [[1, 0], [0.71, 0], [0.58, 0], [0.5, 0], [0.45, 0], [0.41, 0], [0.38, 0], [0.35, 0], [0.33, 0], [0.32, 0], [0.3, 0], [0.29, 0], [0.28, 0], [0.27, 0], [0.26, 0], [0.25, 0], [0.24, 0], [0.24, 0]],
+    /* 11 Meh    */ [[0.5, 0], [0.7, 0.3], [0.9, 0.6], [0.6, 0.9], [0.25, 0], [0.15, 0], [0.2, 0], [0.35, 1.1], [0.45, 1.4], [0.3, 1.7]],
+  ];
+
+  function tableSample(idx, ph) {
+    const h = WAVETABLES[Math.max(0, Math.min(11, idx))];
+    let y = 0, norm = 0;
+    for (let k = 0; k < h.length; k++) {
+      const [a, p] = h[k];
+      if (!a) continue;
+      y += a * Math.sin(2 * Math.PI * (k + 1) * ph + p);
+      norm += Math.abs(a);
+    }
+    return norm ? y / norm : 0;
   }
 
   function osc(svg, o) {
     const [W, H] = size(svg, 240, 96), m = H / 2, g = frame(svg, W, H);
     const col = o.color;
-    let body = grad(g, col, 0.32, 0.02) + `<line class="g-axis" x1="0" y1="${m}" x2="${W}" y2="${m}"/>`;
+    let body = grad(g, col, 0.16, 0.0) + `<line class="g-axis" x1="0" y1="${m}" x2="${W}" y2="${m}"/>`;
     const off = o.shape === 0 || o.level === 0;
     if (svg.parentNode) svg.parentNode.classList.toggle("is-off", off);
     if (off) { svg.innerHTML = body; return; }
@@ -77,17 +100,23 @@
         pts.push([i / N * W, m - v * amp]);
       }
     } else {
-      // Wavetable shapes: Shape Mod morphs between Wave Left and Wave Right (per the manual).
-      let harm = null;
-      if (o.shape >= 5) {
-        const hl = wavetableHarmonics(5 + (o.waveL || 0), 0.6), hr = wavetableHarmonics(5 + (o.waveR || 0), 0.6);
-        harm = hl.map((a, k) => a * (1 - o.mod) + hr[k] * o.mod);
-      }
-      const N = 240;
+      // Wavetables: Shape selects the base wave; Shape Mod is centred -- turning it
+      // left crossfades toward Wave L, right toward Wave R (fully there at the ends).
+      const N = 240, raw = [];
+      const b = (o.modRaw !== undefined ? o.modRaw - 64 : (o.mod - 0.5) * 128) / 64;
       for (let i = 0; i <= N; i++) {
         const x = i / N, ph = (x * 2) % 1;
-        pts.push([x * W, m - waveSample(o.shape, o.mod, ph, harm) * amp]);
+        let y;
+        if (o.shape >= 5) {
+          const base = tableSample(o.shape - 5, ph);
+          const side = b < 0 ? tableSample(o.waveL || 0, ph) : tableSample(o.waveR || 0, ph);
+          const t = Math.min(1, Math.abs(b));
+          y = base * (1 - t) + side * t;
+        } else y = waveSample(o.shape, o.mod, ph, null);
+        raw.push(y);
       }
+      const peak = o.shape >= 5 ? Math.max(1e-3, ...raw.map(Math.abs)) : 1;
+      raw.forEach((y, i) => pts.push([i / N * W, m - (y / peak) * amp]));
     }
     const d = pts.map((p, i) => (i ? "L" : "M") + f1(p[0]) + " " + f1(p[1])).join("");
     body += `<path d="${d}L${W} ${m}L0 ${m}Z" fill="url(#${g})"/>`;
@@ -107,7 +136,7 @@
       `C${f1(x2 + (x3 - x2) * 0.25)} ${f1(sy)} ${f1(x2 + (x3 - x2) * 0.6)} ${f1(sy)} ${f1(x3)} ${f1(sy)}` +
       `L${f1(x4)} ${f1(sy)}` +
       `C${f1(x4 + (x5 - x4) * 0.25)} ${f1(bot)} ${f1(x4 + (x5 - x4) * 0.6)} ${bot} ${f1(x5)} ${bot}`;
-    let s = grad(g, col, 0.38, 0.03) + grid(W, H, 8, 4);
+    let s = grad(g, col, 0.18, 0.0) + grid(W, H, 8, 4);
     s += `<line class="g-axis" x1="0" y1="${bot}" x2="${W}" y2="${bot}"/>`;
     s += `<path d="${d}L${f1(x5)} ${bot}Z" fill="url(#${g})"/>`;
     s += `<path class="g-line" d="${d}" stroke="${col}"/>`;
@@ -144,7 +173,7 @@
       prev = v; pts.push([x * W, m - v * amp]);
     }
     const d = pts.map((p, i) => (i ? "L" : "M") + f1(p[0]) + " " + f1(p[1])).join("");
-    svg.innerHTML = grad(g, col, 0.3, 0.02) + grid(W, H, 8, 4) +
+    svg.innerHTML = grad(g, col, 0.14, 0.0) + grid(W, H, 8, 4) +
       `<line class="g-axis" x1="0" y1="${m}" x2="${W}" y2="${m}"/>` +
       `<path d="${d}L${W} ${m}L0 ${m}Z" fill="url(#${g})"/>` +
       `<path class="g-line" d="${d}" stroke="${col}"/>`;
@@ -168,7 +197,7 @@
     }
     const d = pts.map((p, i) => (i ? "L" : "M") + f1(p[0]) + " " + f1(p[1])).join("");
     const zero = dbTop / (dbTop - dbBot) * H;
-    svg.innerHTML = grad(g, col, 0.34, 0.02) + grid(W, H, 6, 3) +
+    svg.innerHTML = grad(g, col, 0.16, 0.0) + grid(W, H, 6, 3) +
       `<line class="g-axis" x1="0" y1="${f1(zero)}" x2="${W}" y2="${f1(zero)}"/>` +
       `<path d="${d}L${W} ${H}L0 ${H}Z" fill="url(#${g})"/>` +
       `<path class="g-line" d="${d}" stroke="${col}"/>`;

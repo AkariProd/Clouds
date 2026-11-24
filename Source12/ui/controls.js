@@ -85,26 +85,33 @@
     const size = opts.size || 44;
     const wrap = el("div", "knob" + (opts.cls ? " " + opts.cls : ""));
     wrap.style.setProperty("--k", size + "px");
-    const c = size / 2, r = c - 3.5, cap = r - 6;
+    // Chrome-topped knob with a striped (knurled) black body and a red value arc.
+    const c = size / 2, r = c - 3, body = r - 4.5, cap = body * 0.66;
+    const knurlR = body - 1.6, circ = 2 * Math.PI * knurlR, ridges = Math.round(size * 0.9);
     const svg = document.createElementNS(NS, "svg");
     svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
     svg.setAttribute("width", size); svg.setAttribute("height", size);
     svg.innerHTML =
       `<path class="k-track" d="${arc(c, c, r, A0, A1)}"/>` +
       `<path class="k-val"/>` +
+      `<circle class="k-body" cx="${c}" cy="${c}" r="${body}"/>` +
+      `<circle class="k-knurl" cx="${c}" cy="${c}" r="${knurlR}" stroke-width="2.6" stroke-dasharray="${(circ / ridges / 2).toFixed(2)} ${(circ / ridges / 2).toFixed(2)}"/>` +
+      `<line class="k-tick"/>` +
       `<circle class="k-cap" cx="${c}" cy="${c}" r="${cap}"/>` +
-      `<circle class="k-hi" cx="${c}" cy="${c - cap * 0.18}" r="${cap * 0.82}"/>` +
-      `<line class="k-ptr" x1="${c}" y1="${c}" x2="${c}" y2="${c - cap + 2}"/>`;
+      `<circle class="k-hi" cx="${c}" cy="${c - cap * 0.2}" r="${cap * 0.8}"/>` +
+      `<line class="k-ptr"/>`;
     const val = el("div", "k-value");
     const lab = el("div", "k-label", label);
     wrap.append(svg, val, lab);
-    const vPath = svg.querySelector(".k-val"), ptr = svg.querySelector(".k-ptr");
+    const vPath = svg.querySelector(".k-val"), ptr = svg.querySelector(".k-ptr"), tick = svg.querySelector(".k-tick");
     const bip = isBipolar(id);
     function draw() {
       const n = Seer.norm(id), a = A0 + n * (A1 - A0);
       vPath.setAttribute("d", bip ? arc(c, c, r, 0, a) : arc(c, c, r, A0, a));
-      const [x, y] = polar(c, c, cap - 2.5, a), [x0, y0] = polar(c, c, cap * 0.35, a);
+      const [x, y] = polar(c, c, cap - 1.5, a), [x0, y0] = polar(c, c, cap * 0.3, a);
       ptr.setAttribute("x1", x0); ptr.setAttribute("y1", y0); ptr.setAttribute("x2", x); ptr.setAttribute("y2", y);
+      const [tx0, ty0] = polar(c, c, cap + 1, a), [tx1, ty1] = polar(c, c, body - 0.5, a);
+      tick.setAttribute("x1", tx0); tick.setAttribute("y1", ty0); tick.setAttribute("x2", tx1); tick.setAttribute("y2", ty1);
       val.textContent = fmt(id, Seer.get(id));
     }
     Seer.on(id, draw); draw();
@@ -179,7 +186,7 @@
       menu.style.left = left + "px"; menu.style.top = top + "px";
       const mh = menu.offsetHeight, mw = menu.offsetWidth;
       if (top + mh > 870) menu.style.top = Math.max(8, (br.top - ar.top) / s - mh - 4) + "px";
-      if (left + mw > 1430) menu.style.left = (1430 - mw) + "px";
+      if (left + mw > 1410) menu.style.left = (1410 - mw) + "px";
       openMenu = menu;
     });
     btn.addEventListener("wheel", e => { e.preventDefault(); step(e.deltaY < 0 ? -1 : 1); }, { passive: false });

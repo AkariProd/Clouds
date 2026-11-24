@@ -14,7 +14,8 @@ file(GLOB SEER12_UI_FILES CONFIGURE_DEPENDS
      "${CMAKE_CURRENT_LIST_DIR}/../ui/*.html"
      "${CMAKE_CURRENT_LIST_DIR}/../ui/*.css"
      "${CMAKE_CURRENT_LIST_DIR}/../ui/*.js"
-     "${CMAKE_CURRENT_LIST_DIR}/../ui/*.woff2")
+     "${CMAKE_CURRENT_LIST_DIR}/../ui/*.woff2"
+     "${CMAKE_CURRENT_LIST_DIR}/../ui/*.png")
 
 juce_add_binary_data(Seer12UI
     NAMESPACE Seer12UI
