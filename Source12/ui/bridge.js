@@ -10,9 +10,15 @@
 //              "seer:gesture" {id, begin: bool}      host automation gestures
 //              "seer:program" {delta: -1|1}          previous / next program on the hardware
 //              "seer:sync"    {}                     pull a full edit-buffer dump (Sync Now)
-//              "seer:settings" {}                    toggle the native settings drawer
+//               "seer:settings" {}                    toggle the native settings drawer
+//              "seer:presetList" {}                   ask for the native preset list
+//              "seer:presetLoad" {name}               load a native Seer12 preset
+//              "seer:presetStep" {delta: -1|1}         prev/next native preset alphabetically
+//              "seer:presetSave" {name}               save current state as a named preset
+//              "seer:presetDelete" {name}             delete a native preset
 //   C++ -> JS  "seer:params"  {id: value, ...}       changed values (or full snapshot)
 //              "seer:status"  {patch, link, synced, seq}   preset name / MIDI link / last sync
+//              "seer:presetList" {names: [...], current}  native preset list
 //
 // Opened in a normal browser (no __JUCE__), it runs in DEMO mode with local
 // state so the UI can be designed and tested without building the plugin.
@@ -23,6 +29,7 @@
   const listeners = {};
   const anyListeners = [];
   const statusListeners = [];
+  const presetListeners = [];
 
   const juce = () => window.__JUCE__ && window.__JUCE__.backend;
   const isPlugin = !!juce();
@@ -103,6 +110,37 @@
     command(name, payload) { if (isPlugin) juce().emitEvent("seer:" + name, payload || {}); },
     status: { patch: isPlugin ? "" : "Demo patch", link: isPlugin ? "" : "Demo mode (no plugin)", synced: 0, seq: 0 },
     onStatus(fn) { statusListeners.push(fn); fn(this.status); },
+    // Native, in-plugin presets (NOT the host's own preset browser -- works
+    // identically in every DAW). Demo mode keeps a tiny in-memory list so
+    // the preset UI can be designed/tested in a plain browser.
+    presets: { names: isPlugin ? [] : ["Demo Preset A", "Demo Preset B"], current: isPlugin ? "" : "Demo Preset A" },
+    onPresets(fn) { presetListeners.push(fn); fn(this.presets); },
+    loadPreset(name) {
+      if (isPlugin) { juce().emitEvent("seer:presetLoad", { name }); return; }
+      this.presets.current = name;
+      presetListeners.forEach(fn => fn(this.presets));
+    },
+    stepPreset(delta) {
+      if (isPlugin) { juce().emitEvent("seer:presetStep", { delta }); return; }
+      const names = this.presets.names;
+      if (!names.length) return;
+      let i = names.indexOf(this.presets.current);
+      i = (i < 0 ? 0 : (i + delta + names.length) % names.length);
+      this.loadPreset(names[i]);
+    },
+    savePreset(name) {
+      if (isPlugin) { juce().emitEvent("seer:presetSave", { name }); return; }
+      if (!this.presets.names.includes(name)) this.presets.names.push(name);
+      this.presets.names.sort();
+      this.presets.current = name;
+      presetListeners.forEach(fn => fn(this.presets));
+    },
+    deletePreset(name) {
+      if (isPlugin) { juce().emitEvent("seer:presetDelete", { name }); return; }
+      this.presets.names = this.presets.names.filter(n => n !== name);
+      if (this.presets.current === name) this.presets.current = "";
+      presetListeners.forEach(fn => fn(this.presets));
+    },
   };
 
   if (isPlugin) {
@@ -112,6 +150,11 @@
     juce().addEventListener("seer:status", s => {
       Object.assign(window.Seer.status, s);
       statusListeners.forEach(fn => fn(window.Seer.status));
+    });
+    juce().addEventListener("seer:presetList", p => {
+      window.Seer.presets.names = p.names || [];
+      window.Seer.presets.current = p.current || "";
+      presetListeners.forEach(fn => fn(window.Seer.presets));
     });
     juce().emitEvent("seer:ready", {});
   }

@@ -121,6 +121,22 @@ void Seer12Processor::forceSendAllParams()
     }
 }
 
+bool Seer12Processor::loadPreset(const juce::String& name)
+{
+    if (! presetManager.loadPreset(name))
+        return false;
+    forceSendAllParams();
+    return true;
+}
+
+juce::String Seer12Processor::stepPreset(int delta)
+{
+    const auto name = presetManager.stepPreset(delta);
+    if (name.isNotEmpty())
+        forceSendAllParams();
+    return name;
+}
+
 void Seer12Processor::applyFullDump(const std::vector<uint8_t>& dump)
 {
     int applied = 0;

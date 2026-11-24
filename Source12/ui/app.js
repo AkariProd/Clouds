@@ -54,13 +54,79 @@
   const [prevBtn, nextBtn] = lcd.querySelectorAll(".lcd-arrow");
   prevBtn.addEventListener("click", () => Seer.command("program", { delta: -1 }));
   nextBtn.addEventListener("click", () => Seer.command("program", { delta: 1 }));
+
+  // Native Seer12 presets: plugin-side save/load, independent of whatever
+  // preset system the host DAW has (or doesn't have) -- works the same in
+  // every host. Separate from the "PROGRAM" strip above, which reflects the
+  // hardware's own currently-loaded patch.
+  const presetLcd = el("div", "lcd preset", `<button class="lcd-arrow" title="Previous preset">\u2039</button>` +
+    `<div class="lcd-body"><span class="lcd-sec">PRESET</span><span class="lcd-name">\u2014</span></div>` +
+    `<button class="lcd-arrow" title="Next preset">\u203a</button>`);
+  const [presetPrev, presetNext] = presetLcd.querySelectorAll(".lcd-arrow");
+  const presetName = presetLcd.querySelector(".lcd-name");
+  presetPrev.addEventListener("click", () => Seer.stepPreset(-1));
+  presetNext.addEventListener("click", () => Seer.stepPreset(1));
+
+  const saveBtn = el("button", "hbtn preset-save", `<svg viewBox="0 0 24 24" width="14" height="14">` +
+    `<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M5 4h11l3 3v13H5V4Z"/>` +
+    `<path fill="none" stroke="currentColor" stroke-width="1.7" d="M8 4v5h7V4M8 20v-6h8v6"/></svg>`);
+  saveBtn.title = "Save as a new Seer12 preset";
+  const listBtn = el("button", "hbtn preset-browse", `<svg viewBox="0 0 24 24" width="14" height="14">` +
+    `<path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>`);
+  listBtn.title = "Browse / delete Seer12 presets";
+
+  const presetPanel = el("div", "preset-panel");
+  presetPanel.innerHTML = `<div class="pp-save"><input type="text" placeholder="New preset name\u2026" maxlength="64" />` +
+    `<button class="pp-savebtn">Save</button></div><div class="pp-list"></div>`;
+  const ppInput = presetPanel.querySelector("input");
+  const ppSaveBtn = presetPanel.querySelector(".pp-savebtn");
+  const ppList = presetPanel.querySelector(".pp-list");
+
+  function closePresetPanel() { presetPanel.classList.remove("open"); }
+  function openPresetPanel() { presetPanel.classList.add("open"); }
+  listBtn.addEventListener("click", e => { e.stopPropagation(); presetPanel.classList.toggle("open"); });
+  saveBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    openPresetPanel();
+    ppInput.value = Seer.presets.current || "";
+    ppInput.focus();
+    ppInput.select();
+  });
+  document.addEventListener("click", e => { if (!presetPanel.contains(e.target) && e.target !== listBtn && e.target !== saveBtn) closePresetPanel(); });
+  function doSave() {
+    const name = ppInput.value.trim();
+    if (name) { Seer.savePreset(name); ppInput.value = ""; }
+  }
+  ppSaveBtn.addEventListener("click", doSave);
+  ppInput.addEventListener("keydown", e => { if (e.key === "Enter") doSave(); });
+
+  function renderPresetList() {
+    ppList.innerHTML = "";
+    const names = Seer.presets.names;
+    if (!names.length) { ppList.append(el("div", "pp-empty", "No saved presets yet")); return; }
+    names.forEach(name => {
+      const row = el("div", "pp-row" + (name === Seer.presets.current ? " on" : ""));
+      const label = el("span", "pp-name", name);
+      label.addEventListener("click", () => { Seer.loadPreset(name); closePresetPanel(); });
+      const del = el("button", "pp-del", "\u00d7");
+      del.title = "Delete this preset";
+      del.addEventListener("click", e => { e.stopPropagation(); Seer.deletePreset(name); });
+      row.append(label, del);
+      ppList.append(row);
+    });
+  }
+  Seer.onPresets(p => { renderPresetList(); presetName.textContent = p.current || "\u2014"; });
+
+  const presetWrap = el("div", "preset-wrap");
+  presetWrap.append(presetLcd, saveBtn, listBtn, presetPanel);
+
   const syncBtn = el("button", "hbtn sync", `<i></i>SYNC`);
   syncBtn.title = "Pull the full preset from the hardware";
   syncBtn.addEventListener("click", () => { syncBtn.classList.add("busy"); Seer.command("sync"); setTimeout(() => syncBtn.classList.remove("busy"), 1500); });
   const gearBtn = el("button", "hbtn gear", `<svg viewBox="0 0 24 24" width="16" height="16"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"/><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.7 7.7 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.7 7.7 0 0 0 7 6.5l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-1a7.7 7.7 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.7 7.7 0 0 0 2.6-1.5l2.4 1 2-3.4-2-1.6Z"/></svg>`);
   gearBtn.title = "Settings: MIDI link, monitor, SysEx tools";
   gearBtn.addEventListener("click", () => { gearBtn.classList.toggle("on"); Seer.command("settings"); });
-  hdr.append(logo, tabs, lcd, syncBtn, gearBtn);
+  hdr.append(logo, tabs, presetWrap, lcd, syncBtn, gearBtn);
   if (!Seer.isPlugin) hdr.append(el("div", "badge", "DEMO"));
   app.append(hdr);
 

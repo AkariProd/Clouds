@@ -5,6 +5,7 @@
 #include "MidiActivityLog.h"
 #include "SysexCapture.h"
 #include "DirectMidiLink.h"
+#include "PresetManager.h"
 #include <unordered_map>
 
 // Seer12 is an INSTRUMENT: load it on an FL Studio instrument track, play/
@@ -44,6 +45,7 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     juce::AudioProcessorValueTreeState apvts;
+    p12::PresetManager presetManager { apvts };
 
     // Bumped every time a value changes via incoming MIDI, so the editor can
     // tell "host/GUI edit" apart from "hardware knob move" if it ever needs
@@ -91,6 +93,18 @@ public:
     // once) so a slower MIDI interface/hardware input buffer doesn't drop
     // messages from one huge burst.
     void forceSendAllParams();
+
+    // Native, in-plugin preset system (Source12/PresetManager.h) -- works
+    // identically in every host, unlike relying on the DAW's own preset
+    // browser. Loading always force-pushes every param to the hardware
+    // afterward (see .cpp), same guarantee as a DAW project's own saved
+    // state.
+    juce::StringArray getPresetNames() const { return presetManager.getPresetNames(); }
+    juce::String getCurrentPresetName() const { return presetManager.getCurrentPresetName(); }
+    bool savePresetAs(const juce::String& name) { return presetManager.savePresetAs(name); }
+    bool deletePreset(const juce::String& name) { return presetManager.deletePreset(name); }
+    bool loadPreset(const juce::String& name);
+    juce::String stepPreset(int delta);
 
     // Full-preset sync: every ParamDef with a known dumpByteOffset (see
     // Source12/tools/byte_offset_map.json, reverse-engineered against real

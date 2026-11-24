@@ -83,6 +83,7 @@ juce::WebBrowserComponent::Options Seer12Editor::makeBrowserOptions()
             uiReady = true;
             pushValues(true);
             pushStatus(true);
+            pushPresetList();
         })
         .withEventListener("seer:program", [this](const juce::var& v)
         {
@@ -96,6 +97,34 @@ juce::WebBrowserComponent::Options Seer12Editor::makeBrowserOptions()
             settingsOpen = ! settingsOpen;
             settingsPanel.setVisible(settingsOpen);
             resized();
+        })
+        .withEventListener("seer:presetList", [this](const juce::var&) { pushPresetList(); })
+        .withEventListener("seer:presetLoad", [this](const juce::var& v)
+        {
+            if (processor.loadPreset(v.getProperty("name", "").toString()))
+            {
+                pushValues(true);
+                pushPresetList();
+            }
+        })
+        .withEventListener("seer:presetStep", [this](const juce::var& v)
+        {
+            const int delta = (int) v.getProperty("delta", 1);
+            if (processor.stepPreset(delta).isNotEmpty())
+            {
+                pushValues(true);
+                pushPresetList();
+            }
+        })
+        .withEventListener("seer:presetSave", [this](const juce::var& v)
+        {
+            processor.savePresetAs(v.getProperty("name", "").toString());
+            pushPresetList();
+        })
+        .withEventListener("seer:presetDelete", [this](const juce::var& v)
+        {
+            processor.deletePreset(v.getProperty("name", "").toString());
+            pushPresetList();
         })
         .withEventListener("seer:set", [this](const juce::var& v) { handleSet(v); })
         .withEventListener("seer:gesture", [this](const juce::var& v) { handleGesture(v); });
@@ -211,6 +240,21 @@ void Seer12Editor::pushStatus(bool force)
     obj->setProperty("synced", processor.fullSyncAppliedCount.load());
     obj->setProperty("seq", seq);
     webView.emitEventIfBrowserIsVisible("seer:status", juce::var(obj.get()));
+}
+
+void Seer12Editor::pushPresetList()
+{
+    if (! uiReady)
+        return;
+
+    juce::Array<juce::var> names;
+    for (const auto& n : processor.getPresetNames())
+        names.add(n);
+
+    juce::DynamicObject::Ptr obj = new juce::DynamicObject();
+    obj->setProperty("names", names);
+    obj->setProperty("current", processor.getCurrentPresetName());
+    webView.emitEventIfBrowserIsVisible("seer:presetList", juce::var(obj.get()));
 }
 
 void Seer12Editor::timerCallback()

@@ -22,10 +22,16 @@
 //               "seer:program" {delta}        -> processor.changeProgram(delta)
 //               "seer:sync"    {}             -> processor.requestEditBufferDump() (Sync Now)
 //               "seer:settings" {}            -> toggle the native SettingsPanel drawer
+//               "seer:presetList" {}          -> reply with the native preset list
+//               "seer:presetLoad" {name}      -> load a native Seer12 preset
+//               "seer:presetStep" {delta}     -> load prev/next native preset alphabetically
+//               "seer:presetSave" {name}      -> save current state as a named native preset
+//               "seer:presetDelete" {name}    -> delete a native preset
 //   C++ -> JS   "seer:params"  {id: value...} -> changed values, polled at 30 Hz on the
 //                                               message thread (so hardware knob moves
 //                                               decoded by the processor show up live)
 //               "seer:status"  {patch, link, synced, seq} -> header preset strip
+//               "seer:presetList" {names, current} -> native preset list, after any change
 //
 // The settings drawer (Sync Now details, MIDI link reconnect, MIDI monitor,
 // SysEx capture) stays a native JUCE component: it is shown BELOW the web view
@@ -47,6 +53,7 @@ private:
     void timerCallback() override;
     void pushValues(bool fullSnapshot);
     void pushStatus(bool force);
+    void pushPresetList();
     void handleSet(const juce::var& payload);
     void handleGesture(const juce::var& payload);
     std::optional<juce::WebBrowserComponent::Resource> getResource(const juce::String& url);
