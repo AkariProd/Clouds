@@ -345,3 +345,68 @@ sit above the scrollable content, outside the `Viewport`.
 7. **Update this file** whenever you learn something that would have
    saved you time if you'd known it from the start (a gotcha, a wrong
    assumption, a host quirk). That's the whole point of this document.
+
+---
+
+## 10. Web UI redesign (2026-11-24) — supersedes the GUI parts of §4 / §7.3
+
+The editor is now a **Vital-style web UI** (HTML/CSS/JS in `Source12/ui/`)
+shown in a JUCE 8+ `WebBrowserComponent` (WebView2 on Windows). Processor,
+NRPN, SysEx full-dump sync and DirectMidiLink are untouched. The previous
+editor files and root CMakeLists are backed up in `_backup_native_ui/`
+(git has them too). `SectionPanel`, `MultiInstanceSection`, `ParamControl`,
+`CategorizedCombo`, `TopBar` still compile but are no longer used by the
+editor. `SettingsPanel` (+ HardwareSyncPanel, MidiMonitorPanel,
+SysexCapturePanel) IS still used — as a native drawer under the web view.
+
+### Files
+- `PluginEditor.h/.cpp` — WebBrowserComponent + resource provider + bridge,
+  native SettingsPanel drawer. Syntax-checked against JUCE 9.0.6 headers
+  and this repo's headers; **not yet built on Windows**.
+- `ui/` — flat folder, no build step: `index.html`, `styles.css` (design
+  tokens at top), `params.js` (GENERATED), `labels.js`, `bridge.js`,
+  `controls.js`, `graphics.js`, `app.js`, Inter font (OFL).
+- `tools/gen_web_params.py` — regenerates `ui/params.js` from
+  `Parameters.cpp` (incl. option names + categories). **Re-run after every
+  gen_cpp.py run**, or the UI and the plugin's parameters drift apart.
+- `cmake/Seer12WebUI.cmake` — binary data (`Seer12UI`) + WebView2 defines;
+  included from the root CMakeLists Seer12 block.
+
+### Layout (all 245 params bound — verified in headless Chrome)
+Header: tabs, preset strip (‹ patch › = changeProgram, shows last synced
+patch; shows the touched parameter for 2 s), SYNC (= requestEditBufferDump),
+gear (= toggle native settings drawer).
+VOICE: 4 osc rows (waveform preview; wavetable shapes morph Wave L→R with
+Shape Mod), character, feedback, output, LPF/HPF with response curves,
+tabbed envelope editor (Filter/Amp/Env3/Env4), tabbed LFO 1-4, unison,
+glide. MATRIX: 16 slots with grouped (categorised) source/destination
+menus, direct LFO/env destinations, active-routes list. FX: 4 delays +
+character/drive. ARP · GLOBAL: arp with pattern preview, layer mode,
+split point, bend ranges, unison/glide.
+
+### Bridge protocol (ui/bridge.js <-> PluginEditor.cpp)
+JS->C++: `seer:ready`, `seer:set {id,value}` (real value, not 0..1),
+`seer:gesture {id,begin}`, `seer:program {delta}`, `seer:sync`,
+`seer:settings`. C++->JS: `seer:params {id:value...}` (snapshot on ready,
+then changes polled at 30 Hz), `seer:status {patch,link,synced,seq}`.
+
+### Dev workflow
+- Open `ui/index.html` in a browser = DEMO mode (gold badge). Fastest way
+  to iterate on visuals.
+- In the plugin: set env var `SEER12_UI_DIR=<repo>\Source12\ui` before
+  launching -> files served live from disk, Ctrl+R reloads. Otherwise the
+  compiled-in copy is used (rebuild after UI edits).
+
+### Found while porting — needs a fix in build_params.py (not hand-edited)
+- **`lfo_1_shape` has only 5 choices** (triangle, reverse saw, saw, square,
+  random) but the hardware range is 0-7 (… square, pulse 1, pulse 2,
+  pulse 3, random). As an AudioParameterChoice the index is sent as the NRPN
+  value, so picking "random" on LFO 1 sends 4 (= Pulse 1) and the pulses are
+  unreachable. LFO 2-4 are plain ints 0-7 and are fine. Fix: give LFO shape
+  the full 8-entry enum in build_params.py and regenerate (then re-run
+  gen_web_params.py).
+- `bpm` param is gone vs. the older table (fine; the UI no longer uses it).
+
+### Next step
+Build `Seer12_Standalone` (CMake re-configure first), check the UI loads,
+knobs move params, SYNC and ‹ › work with the P12 connected; then FL Studio.

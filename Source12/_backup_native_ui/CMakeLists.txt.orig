@@ -1,0 +1,278 @@
+cmake_minimum_required(VERSION 3.22)
+
+# Must precede project(): these drive the compiler checks.
+#
+# Build a universal binary. Left unset, CMake targets its OWN architecture — and
+# an x86_64 CMake (Intel Homebrew under Rosetta) then silently produces an
+# Intel-only plug-in, which native arm64 hosts skip without any error. arm64
+# macOS starts at 11.0, so the deployment target has to clear that.
+if(APPLE)
+    if(NOT CMAKE_OSX_ARCHITECTURES)
+        set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING
+            "macOS build architectures" FORCE)
+    endif()
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING
+            "Minimum macOS version" FORCE)
+    endif()
+endif()
+
+project(CloudiusVST VERSION 0.2.1 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# JUCE: either a sibling/absolute checkout (-DJUCE_DIR=...) or the macOS
+# default install location.
+set(JUCE_DIR "/Applications/JUCE" CACHE PATH "Path to a JUCE source checkout")
+if(NOT EXISTS "${JUCE_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR "JUCE not found at ${JUCE_DIR} — pass -DJUCE_DIR=/path/to/JUCE")
+endif()
+add_subdirectory("${JUCE_DIR}" "${CMAKE_BINARY_DIR}/JUCE" EXCLUDE_FROM_ALL)
+
+juce_add_plugin(Cloudius
+    COMPANY_NAME            "Sungam"
+    BUNDLE_ID               "com.sungam.cloudius"
+    PLUGIN_MANUFACTURER_CODE Sngm
+    PLUGIN_CODE             Cldu
+    FORMATS                 VST3 AU Standalone
+    PRODUCT_NAME            "Skýjað"
+    DESCRIPTION             "Granular texture processor"
+    IS_SYNTH                FALSE
+    NEEDS_MIDI_INPUT        TRUE
+    NEEDS_MIDI_OUTPUT       FALSE
+    IS_MIDI_EFFECT          FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    VST3_CATEGORIES         Fx Delay Reverb "Pitch Shift"
+    AU_MAIN_TYPE            kAudioUnitType_Effect)
+
+set(CLOUDIUS_PLUGIN_SOURCES
+    Source/PluginProcessor.cpp
+    Source/PluginEditor.cpp
+    Source/Parameters.cpp
+    Source/CloudsEngine.cpp
+    Source/Panel.cpp)
+
+# The Clouds DSP, verbatim from the firmware tree. This is exactly the file
+# list the module's own off-target makefile builds, and TEST is the define it
+# compiles them with — it swaps the STM32 debug pin and the .ramtext attribute
+# for nothing at all.
+set(CLOUDIUS_DSP_SOURCES
+    eurorack/clouds/dsp/correlator.cc
+    eurorack/clouds/dsp/granular_processor.cc
+    eurorack/clouds/dsp/mu_law.cc
+    eurorack/clouds/dsp/pvoc/frame_transformation.cc
+    eurorack/clouds/dsp/pvoc/phase_vocoder.cc
+    eurorack/clouds/dsp/pvoc/stft.cc
+    eurorack/clouds/resources.cc
+    eurorack/stmlib/dsp/atan.cc
+    eurorack/stmlib/dsp/units.cc
+    eurorack/stmlib/utils/random.cc)
+
+target_sources(Cloudius PRIVATE ${CLOUDIUS_PLUGIN_SOURCES} ${CLOUDIUS_DSP_SOURCES})
+
+target_compile_definitions(Cloudius PUBLIC
+    _USE_MATH_DEFINES=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0
+    TEST=1)
+
+# SYSTEM so the firmware's own warning profile doesn't bleed into JUCE's
+# stricter one.
+target_include_directories(Cloudius SYSTEM PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
+target_include_directories(Cloudius PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/Source")
+
+target_link_libraries(Cloudius PRIVATE
+    juce::juce_audio_utils
+    juce::juce_dsp
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags)
+
+# Dev tool: render the faceplate to PNGs without a host. -DCLOUDIUS_PANEL_SHOT=ON
+option(CLOUDIUS_PANEL_SHOT "Build the offscreen faceplate renderer" OFF)
+if(CLOUDIUS_PANEL_SHOT)
+    juce_add_console_app(panel_shot PRODUCT_NAME "panel_shot" NEEDS_CURL FALSE)
+    target_sources(panel_shot PRIVATE
+        tools/panel_shot.cpp ${CLOUDIUS_PLUGIN_SOURCES} ${CLOUDIUS_DSP_SOURCES})
+    target_compile_definitions(panel_shot PRIVATE
+        _USE_MATH_DEFINES=1
+        JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 TEST=1
+        JUCE_STANDALONE_APPLICATION=1 JUCE_MODAL_LOOPS_PERMITTED=1)
+    target_include_directories(panel_shot SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
+    target_include_directories(panel_shot PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
+    target_link_libraries(panel_shot PRIVATE juce::juce_audio_utils juce::juce_dsp)
+endif()
+
+# ---------------------------------------------------------------------------
+# Pebble — port of Mutable Instruments' Beads texture synthesizer.
+# ---------------------------------------------------------------------------
+
+juce_add_plugin(Pebble
+    COMPANY_NAME            "SoulMade"
+    BUNDLE_ID               "com.soulmade.pebble"
+    PLUGIN_MANUFACTURER_CODE Kcrp
+    PLUGIN_CODE             Pbbl
+    FORMATS                 VST3 AU Standalone
+    PRODUCT_NAME            "Pebble"
+    DESCRIPTION             "Texture synthesizer (granular / media-emulating delay)"
+    IS_SYNTH                FALSE
+    NEEDS_MIDI_INPUT        TRUE
+    NEEDS_MIDI_OUTPUT       FALSE
+    IS_MIDI_EFFECT          FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    VST3_CATEGORIES         Fx Delay "Pitch Shift"
+    AU_MAIN_TYPE            kAudioUnitType_Effect)
+
+set(PEBBLE_PLUGIN_SOURCES
+    SourceBeads/PluginProcessor.cpp
+    SourceBeads/PluginEditor.cpp
+    SourceBeads/Parameters.cpp
+    SourceBeads/Panel.cpp
+    SourceBeads/BeadsEngine.cpp)
+
+# The Beads DSP, verbatim from the firmware tree (dsp/ processor path only —
+# the no-input "Synth" fallback oscillator and all hardware driver/UI/
+# settings/calibration code are excluded, see SourceBeads/BeadsEngine.h).
+set(PEBBLE_DSP_SOURCES
+    eurorack/beads/dsp/delay_clock.cc
+    eurorack/beads/dsp/delay_controller.cc
+    eurorack/beads/dsp/mu_law.cc
+    eurorack/beads/dsp/processor.cc
+    eurorack/beads/dsp/trigger_generator.cc
+    eurorack/beads/resources.cc
+    eurorack/stmlib/dsp/atan.cc
+    eurorack/stmlib/dsp/units.cc
+    eurorack/stmlib/utils/random.cc)
+
+target_sources(Pebble PRIVATE ${PEBBLE_PLUGIN_SOURCES} ${PEBBLE_DSP_SOURCES})
+
+target_compile_definitions(Pebble PUBLIC
+    _USE_MATH_DEFINES=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0
+    TEST=1)
+
+target_include_directories(Pebble SYSTEM PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
+target_include_directories(Pebble PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/SourceBeads")
+
+target_link_libraries(Pebble PRIVATE
+    juce::juce_audio_utils
+    juce::juce_dsp
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags)
+
+# Debug-only: a linker MAP file so crash addresses from hosts that don't
+# resolve our PDB (FL Studio's own crash reporter) can still be symbolicated
+# by hand (address - module base -> nearest preceding symbol in the map).
+target_link_options(Pebble_VST3 PRIVATE $<$<CONFIG:Debug>:/MAP>)
+
+# Dev tool: render the panel to PNGs without a host. -DPEBBLE_PANEL_SHOT=ON.
+# See DESIGN.md section 10 -- the prescribed "render, don't guess" loop:
+# build this target, open the PNGs, compare against DESIGN.md/design/refs/
+# before touching code, instead of launching FL Studio or a screenshot tool.
+option(PEBBLE_PANEL_SHOT "Build the offscreen Pebble panel renderer" OFF)
+if(PEBBLE_PANEL_SHOT)
+    juce_add_console_app(pebble_shot PRODUCT_NAME "pebble_shot" NEEDS_CURL FALSE)
+    target_sources(pebble_shot PRIVATE
+        tools/pebble_shot.cpp ${PEBBLE_PLUGIN_SOURCES} ${PEBBLE_DSP_SOURCES})
+    target_compile_definitions(pebble_shot PRIVATE
+        _USE_MATH_DEFINES=1
+        JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 TEST=1
+        JUCE_STANDALONE_APPLICATION=1 JUCE_MODAL_LOOPS_PERMITTED=1)
+    target_include_directories(pebble_shot SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/eurorack")
+    target_include_directories(pebble_shot PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/SourceBeads")
+    target_link_libraries(pebble_shot PRIVATE juce::juce_audio_utils juce::juce_dsp)
+endif()
+
+# Dev tool: live component-bounds/nesting inspector overlay (Ctrl+I in Debug
+# builds of the Standalone/plugin editor). Cloned as a plain git checkout
+# (not FetchContent -- its git-update step failed on this toolchain) into
+# modules/melatonin_inspector, gitignored, see
+# https://github.com/sudara/melatonin_inspector
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/modules/melatonin_inspector/CMakeLists.txt")
+    add_subdirectory(modules/melatonin_inspector)
+    target_link_libraries(Pebble PRIVATE melatonin_inspector)
+    target_compile_definitions(Pebble PRIVATE
+        PEBBLE_HAS_INSPECTOR=$<CONFIG:Debug>)
+else()
+    target_compile_definitions(Pebble PRIVATE PEBBLE_HAS_INSPECTOR=0)
+endif()
+
+# ---------------------------------------------------------------------------
+# Seer12 -- a hardware-synth live editor/controller. NOT a Sequential/DSI
+# product, not affiliated with them, and no vendored firmware: this is an
+# original GUI + MIDI-NRPN receiver only, built from the publicly published
+# Prophet 12 Module Operation Manual's MIDI Implementation chapter (NRPN
+# parameter table). No audio DSP, no panel graphics/trademark copied -- see
+# Source12/ for the generated parameter table and an original knob skin.
+
+juce_add_plugin(Seer12
+    COMPANY_NAME            "SoulMade"
+    BUNDLE_ID               "com.soulmade.seer12"
+    PLUGIN_MANUFACTURER_CODE Kcrp
+    PLUGIN_CODE             Sr12
+    FORMATS                 VST3 AU Standalone
+    PRODUCT_NAME            "Seer12"
+    DESCRIPTION             "Hardware synth live editor/controller (bidirectional MIDI NRPN sync)"
+    IS_SYNTH                TRUE
+    NEEDS_MIDI_INPUT        TRUE
+    NEEDS_MIDI_OUTPUT       TRUE
+    IS_MIDI_EFFECT          FALSE
+    EDITOR_WANTS_KEYBOARD_FOCUS FALSE
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    VST3_CATEGORIES         Instrument Synth
+    AU_MAIN_TYPE            kAudioUnitType_MusicDevice)
+
+set(SEER12_PLUGIN_SOURCES
+    Source12/PluginProcessor.cpp
+    Source12/PluginEditor.cpp
+    Source12/Parameters.cpp
+    Source12/SectionPanel.cpp
+    Source12/MultiInstanceSection.cpp
+    Source12/ParamControl.cpp
+    Source12/MultiInstanceParamControl.cpp
+    Source12/CategorizedCombo.cpp
+    Source12/SysexCapturePanel.cpp
+    Source12/HardwareSyncPanel.cpp
+    Source12/TopBar.cpp
+    Source12/SettingsPanel.cpp
+    Source12/LookAndFeelP12.cpp
+    Source12/MidiMonitorPanel.cpp)
+
+target_sources(Seer12 PRIVATE ${SEER12_PLUGIN_SOURCES})
+
+target_compile_definitions(Seer12 PUBLIC
+    _USE_MATH_DEFINES=1
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_REPORT_APP_USAGE=0)
+
+target_include_directories(Seer12 PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/Source12")
+
+target_link_libraries(Seer12 PRIVATE
+    juce::juce_audio_utils
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags)
+
+target_link_options(Seer12_VST3 PRIVATE $<$<CONFIG:Debug>:/MAP>)

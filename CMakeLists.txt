@@ -237,7 +237,8 @@ juce_add_plugin(Seer12
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD TRUE
     VST3_CATEGORIES         Instrument Synth
-    AU_MAIN_TYPE            kAudioUnitType_MusicDevice)
+    AU_MAIN_TYPE            kAudioUnitType_MusicDevice
+    NEEDS_WEBVIEW2          TRUE)
 
 set(SEER12_PLUGIN_SOURCES
     Source12/PluginProcessor.cpp
@@ -259,7 +260,6 @@ target_sources(Seer12 PRIVATE ${SEER12_PLUGIN_SOURCES})
 
 target_compile_definitions(Seer12 PUBLIC
     _USE_MATH_DEFINES=1
-    JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_DISPLAY_SPLASH_SCREEN=0
@@ -276,3 +276,6 @@ target_link_libraries(Seer12 PRIVATE
     juce::juce_recommended_warning_flags)
 
 target_link_options(Seer12_VST3 PRIVATE $<$<CONFIG:Debug>:/MAP>)
+
+# Web UI (Source12/ui) compiled in as binary data + WebView2 -- see the file for details.
+include(${CMAKE_CURRENT_SOURCE_DIR}/Source12/cmake/Seer12WebUI.cmake)
