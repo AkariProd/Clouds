@@ -222,6 +222,16 @@ endif()
 # parameter table). No audio DSP, no panel graphics/trademark copied -- see
 # Source12/ for the generated parameter table and an original knob skin.
 
+# NEEDS_WEBVIEW2 is a Windows-only juce_add_plugin flag (WebView2 runtime
+# presence check at plugin load) -- harmless to omit on macOS/Linux, which
+# use JUCE's native WKWebView/WebKitGTK backend instead (see PluginEditor.cpp
+# and Source12/cmake/Seer12WebUI.cmake for the platform split).
+if (WIN32)
+    set(SEER12_WEBVIEW2_ARG NEEDS_WEBVIEW2 TRUE)
+else()
+    set(SEER12_WEBVIEW2_ARG)
+endif()
+
 juce_add_plugin(Seer12
     COMPANY_NAME            "SoulMade"
     BUNDLE_ID               "com.soulmade.seer12"
@@ -238,7 +248,7 @@ juce_add_plugin(Seer12
     COPY_PLUGIN_AFTER_BUILD TRUE
     VST3_CATEGORIES         Instrument Synth
     AU_MAIN_TYPE            kAudioUnitType_MusicDevice
-    NEEDS_WEBVIEW2          TRUE)
+    ${SEER12_WEBVIEW2_ARG})
 
 set(SEER12_PLUGIN_SOURCES
     Source12/PluginProcessor.cpp
@@ -275,7 +285,11 @@ target_link_libraries(Seer12 PRIVATE
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags)
 
-target_link_options(Seer12_VST3 PRIVATE $<$<CONFIG:Debug>:/MAP>)
+target_link_options(Seer12_VST3 PRIVATE $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>:/MAP>)
 
 # Web UI (Source12/ui) compiled in as binary data + WebView2 -- see the file for details.
 include(${CMAKE_CURRENT_SOURCE_DIR}/Source12/cmake/Seer12WebUI.cmake)
+
+# ============================================================================
+# GX (working title) -- granular rhythm effect. Everything lives in SourceGX/.
+include(${CMAKE_CURRENT_SOURCE_DIR}/SourceGX/cmake/GX.cmake)

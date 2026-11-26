@@ -25,5 +25,11 @@ juce_add_binary_data(Seer12UI
 target_link_libraries(${SEER12_TARGET} PRIVATE Seer12UI juce::juce_gui_extra)
 
 target_compile_definitions(${SEER12_TARGET} PUBLIC
-    JUCE_WEB_BROWSER=1
-    JUCE_USE_WIN_WEBVIEW2_WITH_STATIC_LINKING=1)
+    JUCE_WEB_BROWSER=1)
+
+# WebView2 static linking is a Windows-only concern -- macOS/Linux use JUCE's
+# native WKWebView/WebKitGTK backend and need no extra defines for it.
+if (WIN32)
+    target_compile_definitions(${SEER12_TARGET} PUBLIC
+        JUCE_USE_WIN_WEBVIEW2_WITH_STATIC_LINKING=1)
+endif()

@@ -65,16 +65,23 @@ juce::WebBrowserComponent::Options Seer12Editor::makeBrowserOptions()
 {
     using Options = juce::WebBrowserComponent::Options;
 
-    // WebView2 needs a writable user-data folder; a host's install folder
-    // usually isn't, so point it at the temp directory.
-    const auto userData = juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("Seer12WebView2");
+    Options opts {};
 
-    return Options {}
-        .withBackend(Options::Backend::webview2)
-        .withWinWebView2Options(Options::WinWebView2 {}
-                                    .withUserDataFolder(userData)
-                                    .withStatusBarDisabled()
-                                    .withBackgroundColour(juce::Colour(0xff121318)))
+#if JUCE_WINDOWS
+    // WebView2 needs a writable user-data folder; a host's install folder
+    // usually isn't, so point it at the temp directory. macOS/Linux use
+    // JUCE's default native backend (WKWebView / WebKitGTK) instead, which
+    // doesn't need any of this -- see Source12/CONTEXT.md for the platform
+    // notes.
+    const auto userData = juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("Seer12WebView2");
+    opts = opts.withBackend(Options::Backend::webview2)
+               .withWinWebView2Options(Options::WinWebView2 {}
+                                            .withUserDataFolder(userData)
+                                            .withStatusBarDisabled()
+                                            .withBackgroundColour(juce::Colour(0xff121318)));
+#endif
+
+    return opts
         .withNativeIntegrationEnabled()
         .withKeepPageLoadedWhenBrowserIsHidden()
         .withResourceProvider([this](const juce::String& url) { return getResource(url); })
