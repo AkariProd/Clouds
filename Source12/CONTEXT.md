@@ -59,6 +59,48 @@ cmake --build . --target Seer12_VST3 --config Release
   that are running): `taskkill /F /IM Seer12.exe` (and close FL Studio, or
   reload the plugin to release its handle on the VST3 DLL).
 
+### macOS (Apple Silicon) build -- `mac-version` branch
+
+This branch (`mac-version`, branched off `seer12-web-ui`) contains the
+cross-platform fixes needed to build Seer12 on macOS -- the Windows-only
+WebView2 code paths are now gated behind `#if JUCE_WINDOWS`/`if (WIN32)`,
+everything else in Source12 was already plain cross-platform JUCE/C++ (no
+architecture-specific code, works on Apple Silicon and Intel Macs alike).
+**This has NOT been built or tested on an actual Mac** -- it was prepared
+on a Windows-only machine with no Xcode/macOS SDK available, so there was
+no way to compile or run it there. Treat it as "should build" based on a
+careful read of every Windows-specific line, not as verified.
+
+To build on macOS:
+```
+cd skyjad   # wherever you cloned the repo, on the mac-version branch
+mkdir -p build && cd build
+cmake -G Xcode -DJUCE_DIR=/path/to/your/JUCE/checkout ..
+cmake --build . --target Seer12_Standalone --config Debug
+cmake --build . --target Seer12_VST3 --config Release
+```
+- Needs a local JUCE 8+ checkout (same requirement as Windows) and Xcode
+  installed with command-line tools (`xcode-select --install`).
+- `Seer12_VST3` should auto-install to `~/Library/Audio/Plug-Ins/VST3/Seer12.vst3`
+  (`COPY_PLUGIN_AFTER_BUILD TRUE` is already set, cross-platform).
+- `AU` format is also configured in `FORMATS` (`VST3 AU Standalone`) and
+  should build alongside VST3 without extra steps -- try `Seer12_AU` too if
+  the DAW you're testing in (e.g. Logic) prefers AU over VST3.
+- The web UI should run through WKWebView automatically -- no WebView2
+  runtime, no NuGet package, no extra setup needed on macOS.
+- **First things to check if the build fails**: (1) any remaining
+  Windows-only API call that slipped through the review -- search Source12
+  for `JUCE_WINDOWS`/`WIN32`/`winmm`/`<windows.h>` and look right around any
+  hit; (2) `DirectMidiLink.h`'s raw `juce::MidiInput`/`MidiOutput` device
+  auto-connect (substring-matches "prophet" in the device name) -- this
+  should work identically via CoreMIDI, but hasn't been exercised against
+  real CoreMIDI device-name strings, which may differ slightly from the
+  Windows MIDI device names recorded elsewhere in this doc ("Prophet 12
+  Keyboard").
+- Once it builds: do the exact same screenshot + real-hardware verification
+  pass described throughout this doc (§2, §9) before trusting it works --
+  a clean compile proves nothing about MIDI behavior.
+
 To verify a change actually works, don't just eyeball the code — launch
 Standalone, screenshot it (this repo has been developed almost entirely via
 an AI driving a real GUI through `computer_use`/accessibility APIs and
